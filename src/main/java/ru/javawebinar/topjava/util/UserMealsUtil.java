@@ -30,43 +30,32 @@ public class UserMealsUtil {
     }
 
     public static List<UserMealWithExcess> filteredByCycles(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        Map<LocalDate, List<UserMeal>> dateMeals = new HashMap<>(); // я не знаю, упорядочен ли meals или нет, так что предполагаем худший сценарий
+        Map<LocalDate, Integer> dateCalories = new HashMap<>();
         for (UserMeal meal : meals) {
             LocalDate date = meal.getDateTime().toLocalDate();
-            if (!dateMeals.containsKey(date)) dateMeals.put(date, new ArrayList<>());
-            dateMeals.get(date).add(meal);
+            dateCalories.putIfAbsent(date, 0);
+            dateCalories.put(date, dateCalories.get(date) + meal.getCalories());
         }
 
         List<UserMealWithExcess> mealsWithExcess = new ArrayList<>();
-        for (Map.Entry<LocalDate, List<UserMeal>> entry : dateMeals.entrySet()) {
-            int currentCalories = 0;
-            for (UserMeal meal : entry.getValue()) {
-                currentCalories += meal.getCalories();
-            }
-            for (UserMeal meal : entry.getValue()) {
-                if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                    mealsWithExcess.add(fromUserMeal(meal, currentCalories > caloriesPerDay));
-                }
+        for (UserMeal meal : meals) {
+            if (TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+                mealsWithExcess.add(fromUserMeal(meal, dateCalories.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
             }
         }
         return mealsWithExcess;
     }
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        Map<LocalDate, List<UserMeal>> dateMeals = meals.stream()
-                .collect(Collectors.groupingBy(meal -> meal.getDateTime().toLocalDate())); // я не знаю, упорядочен ли meals или нет, так что предполагаем худший сценарий
+        Map<LocalDate, Integer> dateCalories = meals.stream()
+                .collect(Collectors.groupingBy(
+                        meal -> meal.getDateTime().toLocalDate(),
+                        Collectors.summingInt(UserMeal::getCalories)
+                ));
 
-        return dateMeals.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .flatMap(entry -> {
-                    int currentCalories = entry.getValue().stream()
-                            .mapToInt(UserMeal::getCalories)
-                            .sum();
-                    return entry.getValue().stream()
-                            .sorted(Comparator.comparing(UserMeal::getDateTime))
-                            .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
-                            .map(meal -> fromUserMeal(meal, currentCalories > caloriesPerDay));
-                })
+        return meals.stream()
+                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
+                .map(meal -> fromUserMeal(meal, dateCalories.get(meal.getDateTime().toLocalDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
