@@ -19,8 +19,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 @WebServlet(name = "MealServlet", value = "/MealServlet")
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(UserServlet.class);
-    final int caloriesPerDay = 2000;
-    List<Meal> meals;
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm:ss");
+    private final int caloriesPerDay = 2000;
+    private List<Meal> meals;
 
     @Override
     public void init() throws ServletException {
@@ -33,7 +34,7 @@ public class MealServlet extends HttpServlet {
         log.info("get");
         List<MealTo> mealsTo = MealsUtil.toMealsTo(meals, caloriesPerDay);
         request.setAttribute("meals", mealsTo);
-        request.setAttribute("dateTimeFormatter", DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm:ss"));
+        request.setAttribute("dateTimeFormatter", dateTimeFormatter);
         request.getRequestDispatcher("meals.jsp").forward(request, response);
     }
 }
