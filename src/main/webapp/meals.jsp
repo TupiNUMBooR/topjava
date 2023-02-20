@@ -16,6 +16,7 @@
         <th>Date</th>
         <th>Description</th>
         <th>Calories</th>
+        <th colspan="2"></th>
     </tr>
     </thead>
     <tbody>
@@ -23,15 +24,20 @@
     <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"/>
     <c:forEach var="meal" items="${meals}">
         <tr class="table-${meal.excess ? "danger" : "success"}">
-            <td>${meal.dateTime.format(dateTimeFormatter)}"</td>
+            <td>${meal.dateTime.format(dateTimeFormatter)}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td><a href="meals?action=update&id=<c:out value="${meal.id}"/>">Update</a></td>
-            <td><a href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a></td>
+            <td><a class="btn btn-sm btn-outline-primary" href="meals?action=update&id=<c:out value="${meal.id}"/>">Update</a>
+            </td>
+            <td><a class="btn btn-sm btn-outline-danger" href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a>
+            </td>
         </tr>
     </c:forEach>
+    <tr>
+        <td colspan="3"></td>
+        <td><a class="btn btn-sm btn-outline-success" href="meals?action=add">Add Meal</a></td>
+    </tr>
     </tbody>
 </table>
-<p><a href="meals?action=add">Add Meal</a></p>
 </body>
 </html>
