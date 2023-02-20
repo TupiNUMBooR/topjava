@@ -12,12 +12,12 @@ import java.util.Map;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class MealDao implements IDao<Meal> {
+public class MealDaoInMemory implements IDao<Meal> {
     private int counter = 0;
     private final Map<Integer, Meal> idMeals = new HashMap<>();
     private static final Logger log = getLogger(UserServlet.class);
 
-    public MealDao() {
+    public MealDaoInMemory() {
         MealsUtil.createHardcodeMeals().forEach(this::add);
     }
 
