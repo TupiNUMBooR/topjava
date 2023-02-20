@@ -53,12 +53,12 @@ public class MealServlet extends HttpServlet {
                 }
                 case "update": {
                     int id = Integer.parseInt(req.getParameter("id"));
-                    req.setAttribute("meal", dao.getById(id));
+                    req.setAttribute("meal", MealsUtil.createTo(dao.getById(id), false));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 }
                 case "add":
-                    req.setAttribute("meal", new Meal(0, LocalDateTime.now(), "", 0));
+                    req.setAttribute("meal", new MealTo(0, LocalDateTime.now(), "", 0, false));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 default:

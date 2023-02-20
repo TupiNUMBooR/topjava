@@ -13,7 +13,7 @@
 <div class="container-fluid">
     <form method="POST" action="meals" name="updateMeal">
         <%--    <jsp:useBean id="dateTimeFormatter" scope="request" type="java.time.format.DateTimeFormatter"/>--%>
-        <jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.Meal"/>
+        <jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.MealTo"/>
         <p><label>ID: <input type="number" name="id" value="${meal.id}" readonly="readonly"></label></p>
         <p><label>Time: <input type="datetime-local" name="dateTime" value="${meal.dateTime}" step="any"></label></p>
         <p><label>Description: <input type="text" name="description" value="${meal.description}"></label></p>
