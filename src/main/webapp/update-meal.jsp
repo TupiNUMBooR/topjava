@@ -21,6 +21,7 @@
         <jsp:useBean id="action" scope="request" type="java.lang.String"/>
         <p><input type="hidden" name="action" value="${action}"></p>
         <p><input type="submit" value="Submit" class="btn btn-outline-primary"/></p>
+        <button class="btn btn-outline-danger" onclick="window.history.back()" type="button">Cancel</button>
     </form>
 </div>
 </body>

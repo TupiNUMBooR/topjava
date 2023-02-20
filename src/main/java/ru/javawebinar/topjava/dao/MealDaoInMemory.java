@@ -6,15 +6,16 @@ import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.UserServlet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealDaoInMemory implements IDao<Meal> {
-    private int counter = 0;
-    private final Map<Integer, Meal> idMeals = new HashMap<>();
+    private final AtomicInteger counter = new AtomicInteger(0);
+    private final Map<Integer, Meal> idMeals = new ConcurrentHashMap<>();
     private static final Logger log = getLogger(UserServlet.class);
 
     public MealDaoInMemory() {
@@ -22,32 +23,32 @@ public class MealDaoInMemory implements IDao<Meal> {
     }
 
     @Override
-    public List<Meal> getAll() {
+    public synchronized List<Meal> getAll() {
         log.trace("getAll");
         return new ArrayList<>(idMeals.values());
     }
 
     @Override
-    public Meal getById(int id) {
+    public synchronized Meal getById(int id) {
         log.trace("getById " + id);
         return idMeals.getOrDefault(id, null);
     }
 
     @Override
-    public void add(Meal meal) {
+    public synchronized void add(Meal meal) {
         log.trace("add " + meal.getId());
-        idMeals.put(counter, new Meal(counter, meal));
-        counter++;
+        int id = counter.getAndIncrement();
+        idMeals.put(id, new Meal(id, meal));
     }
 
     @Override
-    public void update(Meal meal) {
+    public synchronized void update(Meal meal) {
         log.trace("update " + meal.getId());
         idMeals.put(meal.getId(), meal);
     }
 
     @Override
-    public void delete(int id) {
+    public synchronized void delete(int id) {
         log.trace("delete " + id);
         idMeals.remove(id);
     }
