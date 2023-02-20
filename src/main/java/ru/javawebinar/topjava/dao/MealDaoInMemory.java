@@ -38,7 +38,7 @@ public class MealDaoInMemory implements IDao<Meal> {
     public synchronized void add(Meal meal) {
         log.trace("add " + meal.getId());
         int id = counter.getAndIncrement();
-        idMeals.put(id, new Meal(id, meal));
+        idMeals.put(id, new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories()));
     }
 
     @Override

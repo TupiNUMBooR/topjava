@@ -58,7 +58,7 @@ public class MealServlet extends HttpServlet {
                     break;
                 }
                 case "add":
-                    req.setAttribute("meal", new Meal(LocalDateTime.now(), "", 0));
+                    req.setAttribute("meal", new Meal(0, LocalDateTime.now(), "", 0));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 default:
