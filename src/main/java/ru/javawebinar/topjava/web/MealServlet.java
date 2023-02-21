@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -57,7 +58,7 @@ public class MealServlet extends HttpServlet {
                     break;
                 }
                 case "add":
-                    req.setAttribute("meal", new Meal(null, LocalDateTime.now(), "", 0));
+                    req.setAttribute("meal", new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 default:
@@ -69,10 +70,7 @@ public class MealServlet extends HttpServlet {
         if (forward.equals(FORWARD_MEALS)) {
             List<MealTo> mealsTo = MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
             req.setAttribute("meals", mealsTo);
-            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
-        } else if (forward.equals(FORWARD_UPDATE_MEAL)) {
-            // IDEA предлагает убрать лишний if, но если сверху код поменяется - может появиться неочевидный баг, так ведь?
-            req.setAttribute("action", action);
+//            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
         }
         req.getRequestDispatcher(forward).forward(req, resp);
     }

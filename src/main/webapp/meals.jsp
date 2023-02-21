@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib uri="http://example.com" prefix="fs" %>
 <html lang="ru">
 <head>
     <title>Users</title>
@@ -24,7 +25,8 @@
     <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"/>
     <c:forEach var="meal" items="${meals}">
         <tr class="table-${meal.excess ? "danger" : "success"}">
-            <td>${meal.dateTime.format(dateTimeFormatter)}</td>
+<%--            <td>${meal.dateTime.format(dateTimeFormatter)}</td>--%>
+            <td>${fs:formatLocalDateTime(meal.dateTime, 'yyyy-MMM-dd hh:mm')}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
             <td><a class="btn btn-sm btn-outline-primary" href="meals?action=update&id=${meal.id}">Edit</a>
@@ -35,7 +37,7 @@
     </c:forEach>
     <tr>
         <td colspan="3"></td>
-        <td><a class="btn btn-sm btn-outline-success" href="meals?action=add">Add Meal</a></td>
+        <td><a class="btn btn-sm btn-outline-success" href="meals?action=add">Add</a></td>
     </tr>
     </tbody>
 </table>
