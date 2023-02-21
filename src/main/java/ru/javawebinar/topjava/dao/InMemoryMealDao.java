@@ -38,7 +38,7 @@ public class InMemoryMealDao implements Dao<Meal> {
 
     @Override
     public Meal add(Meal meal) {
-        log.trace("add {}", meal.getId());
+        log.trace("add");
         int id = counter.getAndIncrement();
         return mealsMap.put(id, new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories()));
     }

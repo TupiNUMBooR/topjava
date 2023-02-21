@@ -23,8 +23,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm");
-    private static final String FORWARD_UPDATE_MEAL = "/updateMeal.jsp";
-    private static final String FORWARD_MEALS = "/meals.jsp";
+    private static final String FORWARD_UPDATE_MEAL = "/updateMeal.jsp",
+            FORWARD_MEALS = "/meals.jsp",
+            REDIRECT_MEALS = "meals";
     private static final int CALORIES_PER_DAY = 2000;
     private Dao<Meal> dao;
 
@@ -36,48 +37,34 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        log.info("get");
-        String forward;
         String action = req.getParameter("action");
-
-        if (action == null) {
-            forward = FORWARD_MEALS;
+        log.trace("get?action={}", action);
+        if ("delete".equalsIgnoreCase(action)) {
+            log.trace("delete");
+            int id = Integer.parseInt(req.getParameter("id"));
+            dao.delete(id);
+            resp.sendRedirect(REDIRECT_MEALS);
+        } else if ("update".equalsIgnoreCase(action)) {
+            log.trace("update");
+            int id = Integer.parseInt(req.getParameter("id"));
+            req.setAttribute("meal", dao.getById(id));
+            req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
+        } else if ("add".equalsIgnoreCase(action)) {
+            log.trace("add");
+            req.setAttribute("meal", new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0));
+            req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
         } else {
-            action = action.toLowerCase();
-            switch (action) {
-                case "delete": {
-                    int id = Integer.parseInt(req.getParameter("id"));
-                    dao.delete(id);
-                    resp.sendRedirect("meals");
-                    return;
-                }
-                case "update": {
-                    int id = Integer.parseInt(req.getParameter("id"));
-                    req.setAttribute("meal", dao.getById(id));
-                    forward = FORWARD_UPDATE_MEAL;
-                    break;
-                }
-                case "add":
-                    req.setAttribute("meal", new Meal(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0));
-                    forward = FORWARD_UPDATE_MEAL;
-                    break;
-                default:
-                    forward = FORWARD_MEALS;
-                    break;
-            }
-        }
-
-        if (forward.equals(FORWARD_MEALS)) {
+            log.trace("get meals");
             List<MealTo> mealsTo = MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
             req.setAttribute("meals", mealsTo);
 //            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
+            req.getRequestDispatcher(FORWARD_MEALS).forward(req, resp);
         }
-        req.getRequestDispatcher(forward).forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        log.info("post");
+        log.trace("post");
         req.setCharacterEncoding("UTF-8");
         LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
         int calories = Integer.parseInt(req.getParameter("calories"));
