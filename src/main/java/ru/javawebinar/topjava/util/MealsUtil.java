@@ -10,18 +10,15 @@ import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MealsUtil {
-    public static List<MealTo> toMealsToFiltered(List<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
-        return toMealsTo(meals, caloriesPerDay, TimeFilter(startTime, endTime));
-    }
+    public static final Predicate<Meal> TRUE_FILTER = meal -> true;
 
-    public static List<MealTo> toMealsTo(List<Meal> meals, int caloriesPerDay) {
-        return toMealsTo(meals, caloriesPerDay, meal -> true);
+    public static List<MealTo> toMealsToFiltered(List<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
+        //для примера функция
+        return toMealsTo(meals, caloriesPerDay, TimeFilter(startTime, endTime));
     }
 
     public static List<MealTo> toMealsTo(List<Meal> meals, int caloriesPerDay, Predicate<Meal> postFilter) {

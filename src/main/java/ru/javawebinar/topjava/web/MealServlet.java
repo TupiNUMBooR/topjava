@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -55,7 +54,7 @@ public class MealServlet extends HttpServlet {
             req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
         } else {
             log.trace("get meals");
-            List<MealTo> mealsTo = MealsUtil.toMealsTo(dao.getAll(), CALORIES_PER_DAY);
+            List<MealTo> mealsTo = MealsUtil.toMealsTo(dao.getAll(), CALORIES_PER_DAY, MealsUtil.TRUE_FILTER);
             req.setAttribute("meals", mealsTo);
 //            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
             req.getRequestDispatcher(FORWARD_MEALS).forward(req, resp);
