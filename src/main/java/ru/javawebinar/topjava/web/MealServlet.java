@@ -46,7 +46,7 @@ public class MealServlet extends HttpServlet {
         } else if ("update".equalsIgnoreCase(action)) {
             log.trace("update");
             int id = Integer.parseInt(req.getParameter("id"));
-            req.setAttribute("meal", dao.getById(id));
+            req.setAttribute("meal", dao.get(id));
             req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
         } else if ("add".equalsIgnoreCase(action)) {
             log.trace("add");
