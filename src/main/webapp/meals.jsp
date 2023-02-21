@@ -21,7 +21,7 @@
     </tr>
     </thead>
     <tbody>
-    <jsp:useBean id="dateTimeFormatter" scope="request" type="java.time.format.DateTimeFormatter"/>
+<%--    <jsp:useBean id="dateTimeFormatter" scope="request" type="java.time.format.DateTimeFormatter"/>--%>
     <jsp:useBean id="meals" scope="request" type="java.util.List<ru.javawebinar.topjava.model.MealTo>"/>
     <c:forEach var="meal" items="${meals}">
         <tr class="table-${meal.excess ? "danger" : "success"}">
