@@ -1,8 +1,8 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
-import ru.javawebinar.topjava.dao.IDao;
-import ru.javawebinar.topjava.dao.MealDaoInMemory;
+import ru.javawebinar.topjava.dao.Dao;
+import ru.javawebinar.topjava.dao.InMemoryMealDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -13,30 +13,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-//@WebServlet(name = "MealServlet", value = "/MealServlet") к этому я так понял мы еще придем?
 public class MealServlet extends HttpServlet {
-    private static final Logger log = getLogger(UserServlet.class);
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm:ss");
-    private static final String FORWARD_UPDATE_MEAL = "/update-meal.jsp";
+    private static final Logger log = getLogger(MealServlet.class);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm");
+    private static final String FORWARD_UPDATE_MEAL = "/updateMeal.jsp";
     private static final String FORWARD_MEALS = "/meals.jsp";
-    private static final int caloriesPerDay = 2000;
-    private IDao<Meal> dao;
+    private static final int CALORIES_PER_DAY = 2000;
+    private Dao<Meal> dao;
 
     @Override
     public void init() {
         log.trace("init");
-        dao = new MealDaoInMemory();
+        dao = new InMemoryMealDao();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         log.info("get");
-        req.setCharacterEncoding("UTF-8");
         String forward;
         String action = req.getParameter("action");
 
@@ -48,17 +47,17 @@ public class MealServlet extends HttpServlet {
                 case "delete": {
                     int id = Integer.parseInt(req.getParameter("id"));
                     dao.delete(id);
-                    forward = FORWARD_MEALS;
-                    break;
+                    resp.sendRedirect("meals");
+                    return;
                 }
                 case "update": {
                     int id = Integer.parseInt(req.getParameter("id"));
-                    req.setAttribute("meal", MealsUtil.createTo(dao.getById(id), false));
+                    req.setAttribute("meal", dao.getById(id));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 }
                 case "add":
-                    req.setAttribute("meal", new MealTo(0, LocalDateTime.now(), "", 0, false));
+                    req.setAttribute("meal", new Meal(null, LocalDateTime.now(), "", 0));
                     forward = FORWARD_UPDATE_MEAL;
                     break;
                 default:
@@ -68,13 +67,13 @@ public class MealServlet extends HttpServlet {
         }
 
         if (forward.equals(FORWARD_MEALS)) {
-            List<MealTo> mealsTo = MealsUtil.toMealsTo(dao.getAll(), caloriesPerDay);
+            List<MealTo> mealsTo = MealsUtil.filteredByStreams(dao.getAll(), LocalTime.MIN, LocalTime.MAX, CALORIES_PER_DAY);
             req.setAttribute("meals", mealsTo);
+            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
         } else if (forward.equals(FORWARD_UPDATE_MEAL)) {
             // IDEA предлагает убрать лишний if, но если сверху код поменяется - может появиться неочевидный баг, так ведь?
             req.setAttribute("action", action);
         }
-        req.setAttribute("dateTimeFormatter", dateTimeFormatter);
         req.getRequestDispatcher(forward).forward(req, resp);
     }
 
@@ -84,14 +83,12 @@ public class MealServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
         int calories = Integer.parseInt(req.getParameter("calories"));
-        switch (req.getParameter("action").toLowerCase()) {
-            case "add":
-                dao.add(new Meal(0, dateTime, req.getParameter("description"), calories));
-                break;
-            case "update":
-                int id = Integer.parseInt(req.getParameter("id"));
-                dao.update(new Meal(id, dateTime, req.getParameter("description"), calories));
-                break;
+        String idPar = req.getParameter("id");
+        if (idPar == null) {
+            dao.add(new Meal(null, dateTime, req.getParameter("description"), calories));
+        } else {
+            int id = Integer.parseInt(idPar);
+            dao.update(new Meal(id, dateTime, req.getParameter("description"), calories));
         }
 
         resp.sendRedirect("meals");

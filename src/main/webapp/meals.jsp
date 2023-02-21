@@ -27,9 +27,9 @@
             <td>${meal.dateTime.format(dateTimeFormatter)}</td>
             <td>${meal.description}</td>
             <td>${meal.calories}</td>
-            <td><a class="btn btn-sm btn-outline-primary" href="meals?action=update&id=<c:out value="${meal.id}"/>">Update</a>
+            <td><a class="btn btn-sm btn-outline-primary" href="meals?action=update&id=${meal.id}">Edit</a>
             </td>
-            <td><a class="btn btn-sm btn-outline-danger" href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a>
+            <td><a class="btn btn-sm btn-outline-danger" href="meals?action=delete&id=${meal.id}">Delete</a>
             </td>
         </tr>
     </c:forEach>

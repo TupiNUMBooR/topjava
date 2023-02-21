@@ -1,15 +1,17 @@
 package ru.javawebinar.topjava.dao;
 
+import ru.javawebinar.topjava.model.Meal;
+
 import java.util.List;
 
-public interface IDao<T> {
+public interface Dao<T> {
     List<T> getAll();
 
     T getById(int id);
 
-    void add(T t);
+    Meal add(T t);
 
-    void update(T t);
+    Meal update(T t);
 
     void delete(int id);
 }
