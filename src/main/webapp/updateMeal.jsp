@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--<jsp:useBean id="param.action" scope="request" type="java.lang.String"/>--%>
+<%@taglib uri="http://example.com" prefix="fs" %>
 <c:set var="title" scope="request" value='${param.action.equals("add") ? "Add meal" : "Edit meal"}'/>
 <html lang="ru">
 <head>
@@ -14,7 +14,7 @@
 <h2>${title}</h2>
 <form class="container-fluid" method="POST" action="meals" name="updateMeal">
     <jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.Meal"/>
-    <p><label>Time: <input type="datetime-local" name="dateTime" value="${meal.dateTime}" step="any"></label></p>
+    <p><label>Time: <input type="datetime-local" name="dateTime" value="${fs:formatLocalDateTime(meal.dateTime, "yyyy-MM-dd'T'hh:mm")}" step="any"></label></p>
     <p><label>Description: <input type="text" name="description" value="${meal.description}"></label></p>
     <p><label>Calories: <input type="number" name="calories" value="${meal.calories}"></label></p>
     <c:if test="${meal.id != null}">
