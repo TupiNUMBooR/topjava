@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -21,10 +20,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd hh:mm");
-    private static final String FORWARD_UPDATE_MEAL = "/updateMeal.jsp",
-            FORWARD_MEALS = "/meals.jsp",
-            REDIRECT_MEALS = "meals";
+    private static final String FORWARD_UPDATE_MEAL = "/updateMeal.jsp";
+    private static final String FORWARD_MEALS = "/meals.jsp";
+    private static final String REDIRECT_MEALS = "meals";
     private static final int CALORIES_PER_DAY = 2000;
     private Dao<Meal> dao;
 
@@ -46,7 +44,7 @@ public class MealServlet extends HttpServlet {
         } else if ("update".equalsIgnoreCase(action)) {
             log.trace("update");
             int id = Integer.parseInt(req.getParameter("id"));
-            req.setAttribute("meal", dao.get(id));
+            req.setAttribute("meal", dao.getById(id));
             req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
         } else if ("add".equalsIgnoreCase(action)) {
             log.trace("add");
@@ -54,7 +52,7 @@ public class MealServlet extends HttpServlet {
             req.getRequestDispatcher(FORWARD_UPDATE_MEAL).forward(req, resp);
         } else {
             log.trace("get meals");
-            List<MealTo> mealsTo = MealsUtil.toMealsTo(dao.getAll(), CALORIES_PER_DAY, MealsUtil.TRUE_FILTER);
+            List<MealTo> mealsTo = MealsUtil.toMealsTo(dao.getAll(), CALORIES_PER_DAY);
             req.setAttribute("meals", mealsTo);
 //            req.setAttribute("dateTimeFormatter", DATE_TIME_FORMATTER);
             req.getRequestDispatcher(FORWARD_MEALS).forward(req, resp);

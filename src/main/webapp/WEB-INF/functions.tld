@@ -9,8 +9,18 @@
     <short-name>CustomFunctions</short-name>
     <uri>http://example.com</uri>
     <function>
-        <name>formatLocalDateTime</name>
+        <name>formatHumanReadable</name>
         <function-class>ru.javawebinar.topjava.util.DatesUtil</function-class>
-        <function-signature>java.lang.String formatLocalDateTime(java.time.LocalDateTime,java.lang.String)</function-signature>
+        <function-signature>java.lang.String formatHumanReadable(java.time.LocalDateTime)</function-signature>
+    </function>
+    <function>
+        <name>formatHtmlInput</name>
+        <function-class>ru.javawebinar.topjava.util.DatesUtil</function-class>
+        <function-signature>java.lang.String formatHtmlInput(java.time.LocalDateTime)</function-signature>
+    </function>
+    <function>
+        <name>format</name>
+        <function-class>ru.javawebinar.topjava.util.DatesUtil</function-class>
+        <function-signature>java.lang.String format(java.time.LocalDateTime,java.lang.String)</function-signature>
     </function>
 </taglib>

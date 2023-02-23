@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class InMemoryMealDao implements Dao<Meal> {
-    private static final Logger log = getLogger(UserServlet.class);
+    private static final Logger log = getLogger(InMemoryMealDao.class);
 
     private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -31,7 +31,7 @@ public class InMemoryMealDao implements Dao<Meal> {
     }
 
     @Override
-    public Meal get(int id) {
+    public Meal getById(int id) {
         log.trace("getById {}", id);
         return mealsMap.get(id);
     }
@@ -39,15 +39,15 @@ public class InMemoryMealDao implements Dao<Meal> {
     @Override
     public Meal add(Meal meal) {
         log.trace("add");
-        int id = counter.getAndIncrement();
-        return mealsMap.put(id, new Meal(id, meal.getDateTime(), meal.getDescription(), meal.getCalories()));
+        Meal newMeal = new Meal(counter.getAndIncrement(), meal.getDateTime(), meal.getDescription(), meal.getCalories());
+        mealsMap.put(newMeal.getId(), newMeal);
+        return newMeal;
     }
 
     @Override
     public Meal update(Meal meal) {
         log.trace("update {}", meal.getId());
-        if (!mealsMap.containsKey(meal.getId())) throw new IllegalArgumentException("No meal with id " + meal.getId());
-        return mealsMap.put(meal.getId(), meal);
+        return mealsMap.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
