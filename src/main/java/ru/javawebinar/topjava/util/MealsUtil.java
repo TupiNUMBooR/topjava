@@ -28,8 +28,7 @@ public class MealsUtil {
         );
     }
 
-    public static List<MealTo> toMealsToFiltered(List<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
-        //для примера функция
+    public static List<MealTo> toMealsTo(List<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
         return toMealsTo(meals, caloriesPerDay, timeFilter(startTime, endTime));
     }
 
@@ -38,8 +37,6 @@ public class MealsUtil {
     }
 
     private static List<MealTo> toMealsTo(List<Meal> meals, int caloriesPerDay, Predicate<Meal> postFilter) {
-        // сначала хотел реализовать паттерн стратегия через List<Function<Stream<Meal>, Stream<Meal>>> postProcessors
-        // но по моему был бы перебор сложности и абстрактности
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(
                         Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
