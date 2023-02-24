@@ -26,14 +26,14 @@ public class MealRestController {
         this.service = service;
     }
 
-    public List<Meal> getAll() {
+    public List<MealTo> getAll() {
         log.info("getAll");
         return service.getAll(authUserId());
     }
 
-    public List<MealTo> getAllTo(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+    public List<MealTo> getFiltered(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         log.info("getAllTo");
-        return service.getAllTo(authUserId(), startDate, endDate, startTime, endTime);
+        return service.getFiltered(authUserId(), startDate, endDate, startTime, endTime);
     }
 
     public Meal get(int id) {

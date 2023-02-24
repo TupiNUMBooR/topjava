@@ -38,18 +38,21 @@ public class MealService {
         return checkNotFoundWithId(mealRepository.get(id, userId), id);
     }
 
-    public List<Meal> getAll(int userId) {
-        return mealRepository.getAll(userId);
+    public List<MealTo> getAll(int userId) {
+        List<Meal> meals = mealRepository.getAll(userId);
+        if (meals.size() == 0) return new ArrayList<>();
+        User user = checkNotFoundWithId(userRepository.get(userId), userId);
+        return MealsUtil.getTos(meals, user.getCaloriesPerDay());
     }
 
-    public List<MealTo> getAllTo(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+    public List<MealTo> getFiltered(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         List<Meal> meals = mealRepository.getFiltered(userId, startDate, endDate);
         if (meals.size() == 0) return new ArrayList<>();
         User user = checkNotFoundWithId(userRepository.get(userId), userId);
         return MealsUtil.getFilteredTos(meals, user.getCaloriesPerDay(), startTime, endTime);
     }
 
-    public void update(Meal meal, int userId) {
-        checkNotFoundWithId(mealRepository.save(meal, userId), meal.getId());
+    public Meal update(Meal meal, int userId) {
+        return checkNotFoundWithId(mealRepository.save(meal, userId), meal.getId());
     }
 }
