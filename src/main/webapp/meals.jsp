@@ -21,16 +21,29 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
-    <a href="meals?action=create">Add Meal</a>
-    <br><br>
+    <form>
+        <div>
+            <label>Start date (inclusive) <input type="date" name="startDate" value="${param.startDate}"></label>
+            <label>End date (inclusive) <input type="date" name="endDate" value="${param.endDate}"></label>
+        </div>
+        <div>
+            <label>Start time (inclusive) <input type="time" name="startTime" value="${param.startTime}"></label>
+            <label>End time (exclusive) <input type="time" name="endTime" value="${param.endTime}"></label>
+        </div>
+        <div>
+            <input type="submit" value="Submit"/>
+            <button type="button" onclick="window.location.href = window.location.href.split('?')[0]">Reset</button>
+        </div>
+    </form>
+    <br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>
             <th>Date</th>
             <th>Description</th>
             <th>Calories</th>
-            <th></th>
-            <th></th>
+            <th colspan="2"><a href="meals?action=create">Add Meal</a>
+            </th>
         </tr>
         </thead>
         <c:forEach items="${requestScope.meals}" var="meal">

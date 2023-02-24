@@ -12,9 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
@@ -64,7 +67,12 @@ public class MealServlet extends HttpServlet {
                 break;
             case "all":
             default:
-                request.setAttribute("meals", controller.getAll());
+                request.setAttribute("meals", controller.getFiltered(
+                        parse(LocalDate::parse, request.getParameter("startDate")),
+                        parse(LocalDate::parse, request.getParameter("endDate")),
+                        parse(LocalTime::parse, request.getParameter("startTime")),
+                        parse(LocalTime::parse, request.getParameter("endTime"))
+                ));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }
@@ -73,5 +81,9 @@ public class MealServlet extends HttpServlet {
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
+    }
+
+    private <T> T parse(Function<String, T> parser, String string) {
+        return string == null || string.equals("") ? null : parser.apply(string);
     }
 }
