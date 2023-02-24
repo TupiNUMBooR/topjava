@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -39,7 +40,18 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int id, int userId) {
-        return repository.computeIfPresent(id, (id2, meal) -> userId == meal.userId ? null : meal) != null;
+        AtomicBoolean removed = new AtomicBoolean();
+        repository.compute(id, (id2, meal) -> {
+            if (meal != null && userId == meal.userId) {
+                removed.set(true);
+                return null;
+            } else {
+                removed.set(false);
+                return meal;
+            }
+        });
+
+        return removed.get();
     }
 
     @Override
