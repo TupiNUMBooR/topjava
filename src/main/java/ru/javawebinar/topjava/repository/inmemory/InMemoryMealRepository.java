@@ -42,10 +42,6 @@ public class InMemoryMealRepository implements MealRepository {
         getUserRepo(meal.getUserId()).put(meal.getId(), meal);
     }
 
-    private Map<Integer, Meal> getUserRepo(int userId) {
-        return repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>());
-    }
-
     @Override
     public boolean delete(int id, int userId) {
         AtomicBoolean removed = new AtomicBoolean();
@@ -76,6 +72,10 @@ public class InMemoryMealRepository implements MealRepository {
                 .filter(filter)
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private Map<Integer, Meal> getUserRepo(int userId) {
+        return repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>());
     }
 }
 

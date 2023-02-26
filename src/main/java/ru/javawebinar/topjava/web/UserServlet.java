@@ -20,7 +20,7 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         log.info("post?id={}", id);
         SecurityUtil.setAuthUserId(id);
