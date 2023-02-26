@@ -31,8 +31,8 @@ public class InMemoryMealRepository implements MealRepository {
             return meal;
         }
         // handle case: update, but not present in storage
-        Map<Integer, Meal> userRepo = getUserRepo(userId);
-        if (userRepo == EMPTY_MAP) return null;
+        Map<Integer, Meal> userRepo = repository.get(userId);
+        if (userRepo == null) return null;
         return userRepo.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
