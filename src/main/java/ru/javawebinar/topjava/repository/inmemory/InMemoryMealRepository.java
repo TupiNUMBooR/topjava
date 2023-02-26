@@ -7,11 +7,8 @@ import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,36 +17,33 @@ import java.util.stream.Collectors;
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
+    private static final Map<Integer, Meal> EMPTY_MAP = Collections.emptyMap(); // Надеюсь я все правильно использовал
 
     {
-        MealsUtil.meals.forEach(this::add);
+        MealsUtil.meals.forEach(meal -> add(meal, 1));
+        MealsUtil.meals2.forEach(meal -> add(meal, 2));
     }
 
     @Override
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
-            meal.setUserId(userId);
-            add(meal);
+            add(meal, userId);
             return meal;
         }
         // handle case: update, but not present in storage
-        return getUserRepo(userId)
+        return getUserRepo(userId) // не надо создавать, если все равно ничего не положим?
                 .computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
-    private void add(Meal meal) {
+    private void add(Meal meal, int userId) {
         meal.setId(counter.incrementAndGet());
-        getUserRepo(meal.getUserId()).put(meal.getId(), meal);
+        repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>())
+                .put(meal.getId(), meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        AtomicBoolean removed = new AtomicBoolean();
-        getUserRepo(userId).compute(id, (id2, meal) -> {
-            removed.set(meal != null);
-            return null;
-        });
-        return removed.get();
+        return getUserRepo(userId).remove(id) != null;
     }
 
     @Override
@@ -75,7 +69,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     private Map<Integer, Meal> getUserRepo(int userId) {
-        return repository.computeIfAbsent(userId, id -> new ConcurrentHashMap<>());
+        return repository.getOrDefault(userId, EMPTY_MAP);
     }
 }
 
