@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
+    private static final Map<Integer, Meal> EMPTY_MAP = Collections.emptyMap();
     private final Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
-    private static final Map<Integer, Meal> EMPTY_MAP = Collections.emptyMap(); // Надеюсь я все правильно использовал
 
     {
         MealsUtil.meals.forEach(meal -> add(meal, 1));
@@ -31,8 +31,9 @@ public class InMemoryMealRepository implements MealRepository {
             return meal;
         }
         // handle case: update, but not present in storage
-        return getUserRepo(userId) // не надо создавать, если все равно ничего не положим?
-                .computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
+        Map<Integer, Meal> userRepo = getUserRepo(userId);
+        if (userRepo == EMPTY_MAP) return null;
+        return userRepo.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     private void add(Meal meal, int userId) {
