@@ -27,22 +27,31 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        meal.userId = userId;
-
         if (meal.isNew()) {
-            add(meal);
+            add(setUserId(meal, userId));
             return meal;
         }
         // handle case: update, but not present in storage
-        Meal newMeal = repository.computeIfPresent(meal.getId(), (id, oldMeal) -> oldMeal.getUserId() == userId ? meal : oldMeal);
+        Meal newMeal = repository.computeIfPresent(meal.getId(), (id, oldMeal) ->
+                oldMeal.getUserId() == userId ? setUserId(meal, userId) : oldMeal);
         return meal == newMeal ? meal : null;
+    }
+
+    private void add(Meal meal) {
+        meal.setId(counter.incrementAndGet());
+        repository.put(meal.getId(), meal);
+    }
+
+    private Meal setUserId(Meal meal, int userId) {
+        meal.setUserId(userId);
+        return meal;
     }
 
     @Override
     public boolean delete(int id, int userId) {
         AtomicBoolean removed = new AtomicBoolean();
         repository.compute(id, (id2, meal) -> {
-            if (meal != null && userId == meal.userId) {
+            if (meal != null && meal.getUserId() == userId) {
                 removed.set(true);
                 return null;
             } else {
@@ -57,7 +66,7 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal get(int id, int userId) {
         Meal meal = repository.get(id);
-        return meal != null && meal.userId == userId ? meal : null;
+        return meal != null && meal.getUserId() == userId ? meal : null;
     }
 
     @Override
@@ -72,15 +81,10 @@ public class InMemoryMealRepository implements MealRepository {
 
     private List<Meal> getFiltered(int userId, Predicate<Meal> filter) {
         return repository.values().stream()
-                .filter(meal -> meal.userId == userId)
+                .filter(meal -> meal.getUserId() == userId)
                 .filter(filter)
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
-    }
-
-    private void add(Meal meal) {
-        meal.setId(counter.incrementAndGet());
-        repository.put(meal.getId(), meal);
     }
 }
 

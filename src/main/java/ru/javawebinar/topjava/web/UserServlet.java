@@ -24,6 +24,6 @@ public class UserServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         log.info("post?id={}", id);
         SecurityUtil.setAuthUserId(id);
-        request.getRequestDispatcher("/index.html").forward(request, response);
+        response.sendRedirect("meals");
     }
 }
