@@ -32,5 +32,6 @@ CREATE TABLE meals
     description VARCHAR                           NOT NULL,
     time        TIMESTAMP           DEFAULT now() NOT NULL,
     calories    INTEGER             DEFAULT 2000  NOT NULL,
+    CONSTRAINT user_meal_time_idx UNIQUE (user_id, time),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
