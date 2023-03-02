@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -16,9 +17,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
+import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
+import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-repo-jdbc.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
@@ -55,35 +59,69 @@ public class MealServiceTest {
     }
 
     @Test
-    public void deletedNotFound() {
+    public void deletedNotFoundNoMeal() {
         assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, USER_ID));
-        assertThrows(NotFoundException.class, () -> service.delete(meal1.getId(), NOT_FOUND));
+    }
+
+    @Test
+    public void deletedNotFoundNoUser() {
+        assertThrows(NotFoundException.class, () -> service.delete(meal1.getId(), UserTestData.NOT_FOUND));
+    }
+
+    @Test
+    public void deletedNotFoundForeignUser() {
         assertThrows(NotFoundException.class, () -> service.delete(meal1.getId(), ADMIN_ID));
     }
 
     @Test
     public void get() {
         Meal meal = service.get(meal1.getId(), USER_ID);
-        assertMatch(meal1, meal);
+        assertMatch(meal, meal1);
     }
 
     @Test
-    public void getNotFound() {
+    public void getNotFoundNoMeal() {
         assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND, USER_ID));
-        assertThrows(NotFoundException.class, () -> service.get(meal1.getId(), NOT_FOUND));
+    }
+
+    @Test
+    public void getNotFoundNoUser() {
+        assertThrows(NotFoundException.class, () -> service.get(meal1.getId(), UserTestData.NOT_FOUND));
+    }
+
+    @Test
+    public void getNotFoundForeignUser() {
         assertThrows(NotFoundException.class, () -> service.get(meal1.getId(), ADMIN_ID));
     }
 
     @Test
     public void getAll() {
         List<Meal> all = service.getAll(USER_ID);
-        assertMatch(all, userMeals);
+        assertMatch(all, meal7, meal6, meal5, meal4, meal3, meal2, meal1);
     }
 
     @Test
     public void getBetweenInclusive() {
-        List<Meal> filtered = service.getBetweenInclusive(startDate, endDate, USER_ID);
-        assertMatch(filtered, filteredUserMeals);
+        List<Meal> filtered = service.getBetweenInclusive(DATE1, DATE1, USER_ID);
+        assertMatch(filtered, meal3, meal2, meal1);
+    }
+
+    @Test
+    public void getBetweenInclusiveNoLimits() {
+        List<Meal> filtered = service.getBetweenInclusive(null, null, USER_ID);
+        assertMatch(filtered, meal7, meal6, meal5, meal4, meal3, meal2, meal1);
+    }
+
+    @Test
+    public void getBetweenInclusiveLeftLimit() {
+        List<Meal> filtered = service.getBetweenInclusive(DATE2, null, USER_ID);
+        assertMatch(filtered, meal7, meal6, meal5, meal4);
+    }
+
+    @Test
+    public void getBetweenInclusiveRightLimit() {
+        List<Meal> filtered = service.getBetweenInclusive(null, DATE1, USER_ID);
+        assertMatch(filtered, meal3, meal2, meal1);
     }
 
     @Test
@@ -94,11 +132,19 @@ public class MealServiceTest {
     }
 
     @Test
-    public void updateNotFound() {
+    public void updateNotFoundNoMeal() {
         Meal updated = getUpdated();
-        assertThrows(NotFoundException.class, () -> service.update(updated, NOT_FOUND));
-        assertThrows(NotFoundException.class, () -> service.update(updated, ADMIN_ID));
         updated.setId(NOT_FOUND);
         assertThrows(NotFoundException.class, () -> service.update(updated, USER_ID));
+    }
+
+    @Test
+    public void updateNotFoundNoUser() {
+        assertThrows(NotFoundException.class, () -> service.update(getUpdated(), UserTestData.NOT_FOUND));
+    }
+
+    @Test
+    public void updateNotFoundForeignUser() {
+        assertThrows(NotFoundException.class, () -> service.update(getUpdated(), ADMIN_ID));
     }
 }
