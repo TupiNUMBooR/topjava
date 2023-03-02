@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -47,10 +48,24 @@ public class MealServiceTest {
     }
 
     @Test
-    public void duplicateDateTimeCreate() {
+    public void createDuplicateDateTime() {
         assertThrows(DataAccessException.class, () ->
                 service.create(new Meal(meal1.getDateTime(), "Еда", 300), USER_ID));
     }
+
+    @Test
+    public void createNoDateTime() {
+        assertThrows(DataIntegrityViolationException.class, () ->
+                service.create(new Meal(null, "Еда", 300), USER_ID));
+    }
+
+    @Test
+    public void createNoDesc() {
+        assertThrows(DataIntegrityViolationException.class, () ->
+                service.create(new Meal(NEW_DATE_TIME, null, 300), USER_ID));
+    }
+
+    // Не стал проверять на -300 калорий, тк наверно это уже тест для Meal.setCalories ?
 
     @Test
     public void delete() {

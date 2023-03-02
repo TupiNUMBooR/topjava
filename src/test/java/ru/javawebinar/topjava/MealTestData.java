@@ -16,6 +16,7 @@ public class MealTestData {
 
     public static final LocalDate DATE1 = LocalDate.of(2020, Month.JANUARY, 30);
     public static final LocalDate DATE2 = LocalDate.of(2020, Month.JANUARY, 31);
+    public static final LocalDateTime NEW_DATE_TIME = LocalDateTime.of(2020, Month.APRIL, 12, 12, 0);
 
     public static final Meal meal1 = new Meal(MEALS_START, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500);
     public static final Meal meal2 = new Meal(MEALS_START + 1, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000);
