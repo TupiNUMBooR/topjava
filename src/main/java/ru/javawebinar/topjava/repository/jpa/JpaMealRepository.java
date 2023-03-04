@@ -26,6 +26,8 @@ public class JpaMealRepository implements MealRepository {
             em.persist(meal);
             return meal;
         } else {
+            // > 5: При записи в базу через namedQuery валидация энтити не работает, только валидация в БД.
+            // вот тут не понял, надо через criteria делать? или сначала get, потом update?
             int updated = em.createNamedQuery(Meal.MERGE)
                     .setParameter("id", meal.getId())
                     .setParameter("userId", userId)
