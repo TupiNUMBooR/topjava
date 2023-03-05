@@ -12,9 +12,6 @@ import java.time.LocalTime;
 
 @NamedQueries({
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
-        @NamedQuery(name = Meal.GET, query = "SELECT m FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
-        @NamedQuery(name = Meal.MERGE, query = "UPDATE Meal m SET m.dateTime=:dateTime, m.description=:description, " +
-                "m.calories=:calories WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.ALL_SORTED, query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.FILTERED, query = "SELECT m FROM Meal m WHERE m.user.id=:userId AND " +
                 "m.dateTime>=:startDateTime AND m.dateTime<:endDateTime ORDER BY m.dateTime DESC"),
@@ -23,12 +20,6 @@ import java.time.LocalTime;
 @Table(name = "meal", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"},
         name = "meal_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
-
-    @Deprecated
-    public static final String GET = "Meal.get";
-    @Deprecated
-    public static final String MERGE = "Meal.merge";
-
     public static final String DELETE = "Meal.delete";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String FILTERED = "Meal.getFiltered";

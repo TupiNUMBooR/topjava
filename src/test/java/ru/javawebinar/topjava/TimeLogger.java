@@ -19,10 +19,9 @@ public class TimeLogger extends Stopwatch {
 
     @Override
     protected void finished(long n, Description d) {
-        super.finished(n, d);
-        String entry = String.format("%s done in %dms", d.getMethodName(), runtime(TimeUnit.MILLISECONDS));
-        logString.append('\n').append(entry);
-        String className = d.getClassName().substring(d.getClassName().lastIndexOf('.') + 1);
-        logger.debug("{}.{}", className, entry);
+        long ms = runtime(TimeUnit.MILLISECONDS);
+        String name = d.getMethodName();
+        logString.append('\n').append(String.format("%-25s %4d ms", name, ms));
+        logger.debug("{}.{} {} ms", d.getTestClass().getSimpleName(), name, ms);
     }
 }

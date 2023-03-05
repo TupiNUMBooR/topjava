@@ -1,6 +1,8 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class MealServiceTest {
     private MealService service;
 
     @AfterClass
-    public static void WriteLog() {
+    public static void writeLog() {
         logger.debug("{}", logString);
     }
 

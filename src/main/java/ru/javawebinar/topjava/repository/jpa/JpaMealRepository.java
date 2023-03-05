@@ -26,8 +26,8 @@ public class JpaMealRepository implements MealRepository {
             em.persist(meal);
             return meal;
         } else {
-            Meal oldMeal = em.find(Meal.class, meal.getId());
-            if (oldMeal == null || oldMeal.getUser().getId() != userId) return null;
+            Meal oldMeal = get(meal.getId(), userId);
+            if (oldMeal == null) return null;
             meal.setUser(oldMeal.getUser());
             return em.merge(meal);
         }
@@ -46,8 +46,6 @@ public class JpaMealRepository implements MealRepository {
     public Meal get(int id, int userId) {
         Meal meal = em.find(Meal.class, id);
         return meal == null || meal.getUser().getId() != userId ? null : meal;
-        // Практическая разница - такой подход лучше работает с аннотациями, чем namedQuery.
-        //      если meal.user FetchType.EAGER - namedQuery достает юзера вторым запросом, а em.find делает inner join
     }
 
     @Override
