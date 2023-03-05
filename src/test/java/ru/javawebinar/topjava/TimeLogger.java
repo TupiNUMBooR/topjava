@@ -9,11 +9,21 @@ import java.util.concurrent.TimeUnit;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class TimeLogger extends Stopwatch {
-    private final Logger log = getLogger(getClass());
+    private final Logger logger = getLogger(getClass());
+    private final StringBuilder logString;
+
+    public TimeLogger(StringBuilder logString) {
+        super();
+        this.logString = logString;
+    }
 
     @Override
     protected void finished(long n, Description d) {
         super.finished(n, d);
-        log.info("Finished {} in {}ms", d.getMethodName(), runtime(TimeUnit.MILLISECONDS));
+        String e = String.format("%s.%s done in %dms",
+                d.getClassName().substring(d.getClassName().lastIndexOf('.') + 1),
+                d.getMethodName(), runtime(TimeUnit.MILLISECONDS));
+        logger.debug(e);
+        logString.append('\n').append(e);
     }
 }
