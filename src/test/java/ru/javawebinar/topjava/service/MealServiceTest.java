@@ -3,6 +3,8 @@ package ru.javawebinar.topjava.service;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
-import ru.javawebinar.topjava.TimeLogger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -37,7 +39,16 @@ public class MealServiceTest {
     private static final StringBuilder logString = new StringBuilder();
 
     @Rule
-    public final TimeLogger timeLogger = new TimeLogger(logString);
+    public final Stopwatch timeLoggingStopwatch = new Stopwatch() {
+        protected void finished(long n, Description d) {
+            if (logger.isDebugEnabled()) {
+                long ms = runtime(TimeUnit.MILLISECONDS);
+                String name = d.getMethodName();
+                logString.append('\n').append(String.format("%-25s %4d ms", name, ms));
+                logger.debug("{}.{} {} ms", d.getTestClass().getSimpleName(), name, ms);
+            }
+        }
+    };
 
     @Autowired
     private MealService service;
