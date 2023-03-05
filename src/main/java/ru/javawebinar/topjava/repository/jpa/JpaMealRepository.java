@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.jpa;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
@@ -9,7 +10,9 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Transactional(readOnly = true)
@@ -26,16 +29,10 @@ public class JpaMealRepository implements MealRepository {
             em.persist(meal);
             return meal;
         } else {
-            // > 5: При записи в базу через namedQuery валидация энтити не работает, только валидация в БД.
-            // вот тут не понял, надо через criteria делать? или сначала get, потом update?
-            int updated = em.createNamedQuery(Meal.MERGE)
-                    .setParameter("id", meal.getId())
-                    .setParameter("userId", userId)
-                    .setParameter("dateTime", meal.getDateTime())
-                    .setParameter("description", meal.getDescription())
-                    .setParameter("calories", meal.getCalories())
-                    .executeUpdate();
-            return updated != 0 ? meal : null;
+            Meal oldMeal = em.find(Meal.class, meal.getId());
+            if (oldMeal == null || oldMeal.getUser().getId() != userId) return null;
+            meal.setUser(oldMeal.getUser());
+            return em.merge(meal);
         }
     }
 
@@ -50,10 +47,10 @@ public class JpaMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return em.createNamedQuery(Meal.GET, Meal.class)
-                .setParameter("id", id)
-                .setParameter("userId", userId)
-                .getResultStream().findFirst().orElse(null);
+        Meal meal = em.find(Meal.class, id);
+        return meal == null || meal.getUser().getId() != userId ? null : meal;
+        // Практическая разница - такой подход лучше работает с аннотациями, чем namedQuery.
+        //      если meal.user FetchType.EAGER - namedQuery достает юзера вторым запросом, а em.find делает inner join
     }
 
     @Override

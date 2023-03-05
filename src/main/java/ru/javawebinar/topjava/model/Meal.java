@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.model;
 
 import org.hibernate.validator.constraints.Range;
-import ru.javawebinar.topjava.util.LocalDateTimePersistenceConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,15 +24,17 @@ import java.time.LocalTime;
         name = "meal_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
 
-    public static final String DELETE = "Meal.delete";
+    @Deprecated
     public static final String GET = "Meal.get";
+    @Deprecated
     public static final String MERGE = "Meal.merge";
+
+    public static final String DELETE = "Meal.delete";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String FILTERED = "Meal.getFiltered";
 
     @Column(name = "date_time", nullable = false)
     @NotNull
-    @Convert(converter = LocalDateTimePersistenceConverter.class)
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
@@ -46,7 +47,8 @@ public class Meal extends AbstractBaseEntity {
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, nullable = false)
+    @NotNull
     private User user;
 
     public Meal() {

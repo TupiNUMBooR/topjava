@@ -1,8 +1,11 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.Stopwatch;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -10,7 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.javawebinar.topjava.TimeLoggerTestWatcher;
+import org.springframework.transaction.TransactionSystemException;
+import ru.javawebinar.topjava.TimeLogger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -33,7 +37,11 @@ public class MealServiceTest {
     private MealService service;
 
     @Rule
-    public final TestWatcher watcher = new TimeLoggerTestWatcher();
+    public final TimeLogger timeLogger = new TimeLogger();
+
+    @AfterClass
+    public static void WriteSummary() {
+    }
 
     @Test
     public void delete() {
@@ -88,6 +96,14 @@ public class MealServiceTest {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
+    }
+
+    @Test
+    public void updateEmptyDesc() {
+        Meal updated = getUpdated();
+        updated.setDescription(null);
+        assertThrows(TransactionSystemException.class, () -> service.update(updated, USER_ID));
+        // надо ли вылавливать внутреннее ConstraintViolationException?
     }
 
     @Test
