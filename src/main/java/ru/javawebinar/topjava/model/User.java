@@ -56,8 +56,8 @@ public class User extends AbstractNamedEntity {
     @Range(min = 10, max = 10000)
     private Integer caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "user_id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    @MapKeyColumn(name = "id")
     @OrderBy("dateTime DESC")
     private List<Meal> meals;
 
