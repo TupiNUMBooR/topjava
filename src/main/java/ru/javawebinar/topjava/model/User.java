@@ -37,7 +37,7 @@ public class User extends AbstractNamedEntity {
     @Size(min = 5, max = 128)
     private String password;
 
-    @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
+    @Column(name = "enabled", nullable = false) // не работает автосоздание в hsqldb со старым columnDefinition
     private Boolean enabled = true;
 
     @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()", updatable = false)
