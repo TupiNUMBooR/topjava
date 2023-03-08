@@ -38,7 +38,7 @@ public class User extends AbstractNamedEntity {
     private String password;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "bool default true")
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()", updatable = false)
     @CreationTimestamp
@@ -54,7 +54,11 @@ public class User extends AbstractNamedEntity {
 
     @Column(name = "calories_per_day", nullable = false, columnDefinition = "int default 2000")
     @Range(min = 10, max = 10000)
-    private int caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
+    private Integer caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
+
+    public static User ofId(Integer id) {
+        return new User(id, null, null, null, null, null, null, null);
+    }
 
     public User() {
     }
@@ -67,7 +71,7 @@ public class User extends AbstractNamedEntity {
         this(id, name, email, password, DEFAULT_CALORIES_PER_DAY, true, new Date(), List.of(roles));
     }
 
-    public User(Integer id, String name, String email, String password, int caloriesPerDay, boolean enabled, Date registered, Collection<Role> roles) {
+    public User(Integer id, String name, String email, String password, Integer caloriesPerDay, Boolean enabled, Date registered, Collection<Role> roles) {
         super(id, name);
         this.email = email;
         this.password = password;
@@ -97,19 +101,19 @@ public class User extends AbstractNamedEntity {
         this.registered = registered;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public int getCaloriesPerDay() {
+    public Integer getCaloriesPerDay() {
         return caloriesPerDay;
     }
 
-    public void setCaloriesPerDay(int caloriesPerDay) {
+    public void setCaloriesPerDay(Integer caloriesPerDay) {
         this.caloriesPerDay = caloriesPerDay;
     }
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
