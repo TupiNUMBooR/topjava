@@ -117,6 +117,10 @@ public class User extends AbstractNamedEntity {
         return enabled;
     }
 
+    public Boolean getEnabled() { // иначе jdbc тест валится по create
+        return enabled;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
