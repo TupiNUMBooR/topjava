@@ -24,9 +24,9 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 
 public abstract class MealServiceTest extends ServiceTest {
-    private static final Logger log = getLogger("result");
+    protected static final Logger log = getLogger("result");
 
-    private static final StringBuilder results = new StringBuilder();
+    protected static final StringBuilder results = new StringBuilder();
 
     @Rule
     // http://stackoverflow.com/questions/14892125/what-is-the-best-practice-to-determine-the-execution-time-of-the-bussiness-relev
@@ -40,7 +40,7 @@ public abstract class MealServiceTest extends ServiceTest {
     };
 
     @Autowired
-    private MealService service;
+    protected MealService service;
 
     @AfterClass
     public static void printResult() {
