@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class MealService {
     @Transactional(readOnly = true)
     public Meal getWithUser(int id, int userId) {
         Meal meal = checkNotFoundWithId(repository.get(id, userId), id);
-        Hibernate.initialize(meal.getUser());
+        meal.setUser((User) Hibernate.unproxy(meal.getUser()));
         return meal;
     }
 
