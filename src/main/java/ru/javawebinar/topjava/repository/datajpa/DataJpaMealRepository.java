@@ -5,10 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -16,9 +13,6 @@ import java.util.List;
 public class DataJpaMealRepository implements MealRepository {
     private final CrudMealRepository crudRepository;
     private final CrudUserRepository crudUserRepository;
-
-    @PersistenceContext
-    private EntityManager em;
 
     public DataJpaMealRepository(CrudMealRepository crudRepository, CrudUserRepository crudUserRepository) {
         this.crudRepository = crudRepository;
@@ -48,9 +42,7 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public Meal getWithUser(int id, int userId) {
-        var properties = new HashMap<String, Object>();
-        properties.put("javax.persistence.fetchgraph", em.getEntityGraph("meal-with-user"));
-        var meal = em.find(Meal.class, id, properties);
+        var meal = crudRepository.findWithUserById(id);
         return meal != null && meal.getUser().getId() == userId ? meal : null;
     }
 

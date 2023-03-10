@@ -18,12 +18,6 @@ import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
         @NamedQuery(name = User.BY_EMAIL, query = "SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email=?1"),
         @NamedQuery(name = User.ALL_SORTED, query = "SELECT u FROM User u LEFT JOIN FETCH u.roles ORDER BY u.name, u.email"),
 })
-@NamedEntityGraph(
-        name = "user-with-meals",
-        attributeNodes = {
-                @NamedAttributeNode("meals")
-        }
-)
 @Entity
 @Table(name = "users")
 public class User extends AbstractNamedEntity {
