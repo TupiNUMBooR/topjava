@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Repository
 @Profile("!" + Profiles.HSQL_DB)
 public class SimpleJdbcMealRepository extends JdbcMealRepository<LocalDateTime> {
-    public SimpleJdbcMealRepository(JdbcTemplate jt, NamedParameterJdbcTemplate npjt) {
-        super(jt, npjt);
+    public SimpleJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @Override

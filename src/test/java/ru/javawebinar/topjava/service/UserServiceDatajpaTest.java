@@ -9,15 +9,14 @@ import ru.javawebinar.topjava.model.User;
 
 import java.util.List;
 
-import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
-import static ru.javawebinar.topjava.MealTestData.meals;
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.UserTestData.getUpdated;
 
 @ActiveProfiles(resolver = ActiveDbProfileResolver.class, profiles = Profiles.DATAJPA)
 public class UserServiceDatajpaTest extends UserServiceTest {
     @Test
-    public void getWithUser() {
+    public void getWithMeals() {
         User actual = service.getWithMeals(USER_ID);
         USER_MATCHER.assertMatch(actual, user);
         MEAL_MATCHER.assertMatch(Hibernate.unproxy(actual.getMeals(), List.class), meals);

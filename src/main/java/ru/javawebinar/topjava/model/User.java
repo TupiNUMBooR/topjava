@@ -37,7 +37,7 @@ public class User extends AbstractNamedEntity {
     @Size(min = 5, max = 128)
     private String password;
 
-    @Column(name = "enabled", nullable = false) // не работает автосоздание в hsqldb со старым columnDefinition
+    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
     private Boolean enabled = true;
 
     @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()", updatable = false)
@@ -56,8 +56,7 @@ public class User extends AbstractNamedEntity {
     @Range(min = 10, max = 10000)
     private Integer caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
-    @MapKeyColumn(name = "id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @OrderBy("dateTime DESC")
     private List<Meal> meals;
 
