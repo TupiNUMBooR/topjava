@@ -38,7 +38,7 @@ public class User extends AbstractNamedEntity {
     private String password;
 
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
-    private Boolean enabled = true;
+    private boolean enabled = true;
 
     @Column(name = "registered", nullable = false, columnDefinition = "timestamp default now()", updatable = false)
     @CreationTimestamp
@@ -54,7 +54,7 @@ public class User extends AbstractNamedEntity {
 
     @Column(name = "calories_per_day", nullable = false, columnDefinition = "int default 2000")
     @Range(min = 10, max = 10000)
-    private Integer caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
+    private int caloriesPerDay = DEFAULT_CALORIES_PER_DAY;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @OrderBy("dateTime DESC")
@@ -71,7 +71,7 @@ public class User extends AbstractNamedEntity {
         this(id, name, email, password, DEFAULT_CALORIES_PER_DAY, true, new Date(), List.of(roles));
     }
 
-    public User(Integer id, String name, String email, String password, Integer caloriesPerDay, Boolean enabled, Date registered, Collection<Role> roles) {
+    public User(Integer id, String name, String email, String password, int caloriesPerDay, Boolean enabled, Date registered, Collection<Role> roles) {
         super(id, name);
         this.email = email;
         this.password = password;
@@ -79,10 +79,6 @@ public class User extends AbstractNamedEntity {
         this.enabled = enabled;
         this.registered = registered;
         setRoles(roles);
-    }
-
-    public static User ofId(Integer id) {
-        return new User(id, null, null, null, null, null, null, null);
     }
 
     public String getEmail() {
@@ -101,23 +97,19 @@ public class User extends AbstractNamedEntity {
         this.registered = registered;
     }
 
-    public Integer getCaloriesPerDay() {
+    public int getCaloriesPerDay() {
         return caloriesPerDay;
     }
 
-    public void setCaloriesPerDay(Integer caloriesPerDay) {
+    public void setCaloriesPerDay(int caloriesPerDay) {
         this.caloriesPerDay = caloriesPerDay;
     }
 
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public Boolean getEnabled() { // иначе jdbc тест валится по create
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 

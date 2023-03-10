@@ -38,7 +38,7 @@ public class Meal extends AbstractBaseEntity {
 
     @Column(name = "calories", nullable = false)
     @Range(min = 10, max = 5000)
-    private Integer calories;
+    private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -48,26 +48,15 @@ public class Meal extends AbstractBaseEntity {
     public Meal() {
     }
 
-    public Meal(LocalDateTime dateTime, String description, Integer calories) {
+    public Meal(LocalDateTime dateTime, String description, int calories) {
         this(null, dateTime, description, calories);
     }
 
-    public Meal(Integer id, LocalDateTime dateTime, String description, Integer calories) {
+    public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
         super(id);
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
-    }
-
-    public static Meal ofIdAndUserId(Integer id, Integer userId) {
-        var user = User.ofId(userId);
-        var meal = ofId(id);
-        meal.user = user;
-        return meal;
-    }
-
-    public static Meal ofId(Integer id) {
-        return new Meal(id, null, null, null);
     }
 
     public LocalDateTime getDateTime() {
@@ -86,11 +75,11 @@ public class Meal extends AbstractBaseEntity {
         this.description = description;
     }
 
-    public Integer getCalories() {
+    public int getCalories() {
         return calories;
     }
 
-    public void setCalories(Integer calories) {
+    public void setCalories(int calories) {
         this.calories = calories;
     }
 
