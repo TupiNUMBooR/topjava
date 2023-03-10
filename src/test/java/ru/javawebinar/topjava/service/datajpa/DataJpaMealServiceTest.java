@@ -13,7 +13,7 @@ import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 
 @ActiveProfiles(profiles = Profiles.DATAJPA)
-public class DatajpaMealServiceTest extends MealServiceTest {
+public class DataJpaMealServiceTest extends MealServiceTest {
     @Test
     public void getWithUser() {
         Meal actual = service.getWithUser(ADMIN_MEAL_ID, ADMIN_ID);
@@ -22,7 +22,12 @@ public class DatajpaMealServiceTest extends MealServiceTest {
     }
 
     @Test
-    public void getWithUserNotExist() {
+    public void getWithUserNotExistUser() {
         assertThrows(NotFoundException.class, () -> service.getWithUser(ADMIN_MEAL_ID, NOT_FOUND));
+    }
+
+    @Test
+    public void getWithUserNotExistMeal() {
+        assertThrows(NotFoundException.class, () -> service.getWithUser(NOT_FOUND, ADMIN_ID));
     }
 }

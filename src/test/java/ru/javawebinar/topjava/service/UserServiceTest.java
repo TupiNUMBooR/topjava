@@ -1,17 +1,13 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.Stopwatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.rules.StopwatchLogger;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.List;
@@ -20,19 +16,11 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class UserServiceTest extends ServiceTest {
-    @Rule
-    public final Stopwatch stopwatch = new StopwatchLogger();
-
     @Autowired
     protected UserService service;
 
     @Autowired
     private CacheManager cacheManager;
-
-    @AfterClass
-    public static void printResult() {
-        StopwatchLogger.printResult();
-    }
 
     @Before
     public void setup() {
