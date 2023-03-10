@@ -1,12 +1,9 @@
 package ru.javawebinar.topjava.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
@@ -18,7 +15,6 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
 public class MealService {
-
     private final MealRepository repository;
 
     public MealService(MealRepository repository) {
@@ -29,11 +25,8 @@ public class MealService {
         return checkNotFoundWithId(repository.get(id, userId), id);
     }
 
-    @Transactional(readOnly = true)
     public Meal getWithUser(int id, int userId) {
-        Meal meal = checkNotFoundWithId(repository.get(id, userId), id);
-        meal.setUser((User) Hibernate.unproxy(meal.getUser()));
-        return meal;
+        return checkNotFoundWithId(repository.getWithUser(id, userId), id);
     }
 
     public void delete(int id, int userId) {

@@ -5,7 +5,9 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserServiceTest;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.MealTestData.meals;
 import static ru.javawebinar.topjava.UserTestData.*;
@@ -24,6 +26,11 @@ public class DataJpaUserServiceTest extends UserServiceTest {
         User actual = service.getWithMeals(GUEST_ID);
         USER_MATCHER.assertMatch(actual, guest);
         MEAL_MATCHER.assertMatch(actual.getMeals());
+    }
+
+    @Test
+    public void getWithMealsNoUser() {
+        assertThrows(NotFoundException.class, () -> service.getWithMeals(NOT_FOUND));
     }
 
     @Test

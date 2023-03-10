@@ -1,10 +1,8 @@
 package ru.javawebinar.topjava.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
@@ -16,7 +14,6 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
 public class UserService {
-
     private final UserRepository repository;
 
     public UserService(UserRepository repository) {
@@ -43,11 +40,8 @@ public class UserService {
         return checkNotFound(repository.getByEmail(email), "email=" + email);
     }
 
-    @Transactional(readOnly = true)
     public User getWithMeals(int id) {
-        User user = checkNotFoundWithId(repository.get(id), id);
-        Hibernate.initialize(user.getMeals());
-        return user;
+        return checkNotFoundWithId(repository.getWithMeals(id), id);
     }
 
     @Cacheable("users")

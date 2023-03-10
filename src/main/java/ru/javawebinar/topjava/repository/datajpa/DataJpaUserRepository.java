@@ -5,6 +5,9 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -12,6 +15,9 @@ public class DataJpaUserRepository implements UserRepository {
     private static final Sort SORT_NAME_EMAIL = Sort.by(Sort.Direction.ASC, "name", "email");
 
     private final CrudUserRepository crudRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     public DataJpaUserRepository(CrudUserRepository crudRepository) {
         this.crudRepository = crudRepository;
@@ -30,6 +36,13 @@ public class DataJpaUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         return crudRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public User getWithMeals(int id) {
+        var properties = new HashMap<String, Object>();
+        properties.put("javax.persistence.fetchgraph", em.getEntityGraph("user-with-meals"));
+        return em.find(User.class, id, properties);
     }
 
     @Override
