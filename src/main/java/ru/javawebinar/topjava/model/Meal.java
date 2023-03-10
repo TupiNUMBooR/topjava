@@ -45,17 +45,6 @@ public class Meal extends AbstractBaseEntity {
     @NotNull
     private User user;
 
-    public static Meal ofIdAndUserId(Integer id, Integer userId) {
-        var user = User.ofId(userId);
-        var meal = ofId(id);
-        meal.user = user;
-        return meal;
-    }
-
-    public static Meal ofId(Integer id) {
-        return new Meal(id, null, null, null);
-    }
-
     public Meal() {
     }
 
@@ -70,16 +59,39 @@ public class Meal extends AbstractBaseEntity {
         this.calories = calories;
     }
 
+    public static Meal ofIdAndUserId(Integer id, Integer userId) {
+        var user = User.ofId(userId);
+        var meal = ofId(id);
+        meal.user = user;
+        return meal;
+    }
+
+    public static Meal ofId(Integer id) {
+        return new Meal(id, null, null, null);
+    }
+
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Integer getCalories() {
         return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
     }
 
     public LocalDate getDate() {
@@ -88,18 +100,6 @@ public class Meal extends AbstractBaseEntity {
 
     public LocalTime getTime() {
         return dateTime.toLocalTime();
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCalories(Integer calories) {
-        this.calories = calories;
     }
 
     public User getUser() {

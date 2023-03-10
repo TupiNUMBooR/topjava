@@ -60,10 +60,6 @@ public class User extends AbstractNamedEntity {
     @OrderBy("dateTime DESC")
     private List<Meal> meals;
 
-    public static User ofId(Integer id) {
-        return new User(id, null, null, null, null, null, null, null);
-    }
-
     public User() {
     }
 
@@ -85,6 +81,10 @@ public class User extends AbstractNamedEntity {
         setRoles(roles);
     }
 
+    public static User ofId(Integer id) {
+        return new User(id, null, null, null, null, null, null, null);
+    }
+
     public String getEmail() {
         return email;
     }
@@ -93,20 +93,12 @@ public class User extends AbstractNamedEntity {
         this.email = email;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public Date getRegistered() {
         return registered;
     }
 
     public void setRegistered(Date registered) {
         this.registered = registered;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
     }
 
     public Integer getCaloriesPerDay() {
@@ -125,6 +117,10 @@ public class User extends AbstractNamedEntity {
         return enabled;
     }
 
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -135,6 +131,10 @@ public class User extends AbstractNamedEntity {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Meal> getMeals() {

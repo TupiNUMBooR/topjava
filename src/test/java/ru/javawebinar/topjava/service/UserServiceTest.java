@@ -29,14 +29,14 @@ public abstract class UserServiceTest extends ServiceTest {
     @Autowired
     private CacheManager cacheManager;
 
-    @Before
-    public void setup() {
-        cacheManager.getCache("users").clear();
-    }
-
     @AfterClass
     public static void printResult() {
         StopwatchLogger.printResult();
+    }
+
+    @Before
+    public void setup() {
+        cacheManager.getCache("users").clear();
     }
 
     @Test
