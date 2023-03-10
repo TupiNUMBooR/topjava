@@ -1,7 +1,10 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.DataAccessException;
@@ -16,16 +19,23 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 public abstract class UserServiceTest extends ServiceTest {
+    @Rule
+    public final Stopwatch stopwatch = new StopwatchLogger();
 
     @Autowired
     protected UserService service;
 
     @Autowired
-    protected CacheManager cacheManager;
+    private CacheManager cacheManager;
 
     @Before
     public void setup() {
         cacheManager.getCache("users").clear();
+    }
+
+    @AfterClass
+    public static void printResult() {
+        StopwatchLogger.printResult();
     }
 
     @Test
