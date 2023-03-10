@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.service;
+package ru.javawebinar.topjava.rules;
 
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
