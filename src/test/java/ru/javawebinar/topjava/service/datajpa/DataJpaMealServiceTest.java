@@ -8,6 +8,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealServiceTest;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -19,6 +20,12 @@ public class DataJpaMealServiceTest extends MealServiceTest {
         Meal actual = service.getWithUser(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
         UserTestData.USER_MATCHER.assertMatch(actual.getUser(), UserTestData.admin);
+    }
+
+    @Test
+    public void getWithUserCheckRoles() {
+        Meal actual = service.getWithUser(ADMIN_MEAL_ID, ADMIN_ID);
+        assertEquals(actual.getUser().getRoles(), UserTestData.admin.getRoles());
     }
 
     @Test
