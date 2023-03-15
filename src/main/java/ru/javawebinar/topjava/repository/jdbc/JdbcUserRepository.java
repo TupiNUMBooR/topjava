@@ -4,14 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Repository
@@ -25,6 +29,25 @@ public class JdbcUserRepository implements UserRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final SimpleJdbcInsert insertUser;
+
+    private final ResultSetExtractor<List<User>> userExtractor = new RowMapperResultSetExtractor<>(ROW_MAPPER);
+    private final ResultSetExtractor<List<User>> userExtractor2 = rs -> {
+        var users = new LinkedHashMap<Integer, User>();
+        while (rs.next()) {
+            var id = rs.getInt("id");
+            User user;
+            if (users.containsKey(id)) {
+                user = users.get(id);
+            } else {
+                user = ROW_MAPPER.mapRow(rs, 0);
+                user.setRoles(List.of());
+                users.put(id, user);
+            }
+            var role = rs.getString("role");
+            if (role != null) user.getRoles().add(Role.valueOf(role));
+        }
+        return users.values().stream().toList();
+    };
 
     @Autowired
     public JdbcUserRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
@@ -61,19 +84,23 @@ public class JdbcUserRepository implements UserRepository {
 
     @Override
     public User get(int id) {
-        List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE id=?", ROW_MAPPER, id);
+        List<User> users = jdbcTemplate.query("SELECT * FROM users " +
+                "LEFT JOIN user_role role ON users.id = role.user_id WHERE id=?", userExtractor2, id);
         return DataAccessUtils.singleResult(users);
     }
 
     @Override
     public User getByEmail(String email) {
 //        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
-        List<User> users = jdbcTemplate.query("SELECT * FROM users WHERE email=?", ROW_MAPPER, email);
+        List<User> users = jdbcTemplate.query("SELECT * FROM users " +
+                "LEFT JOIN user_role role ON users.id = role.user_id WHERE email=?", userExtractor2, email);
         return DataAccessUtils.singleResult(users);
     }
 
     @Override
     public List<User> getAll() {
-        return jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
+        return jdbcTemplate.query("SELECT * FROM users " +
+                "LEFT JOIN user_role role ON users.id = role.user_id " +
+                "ORDER BY name, email", userExtractor2);
     }
 }
