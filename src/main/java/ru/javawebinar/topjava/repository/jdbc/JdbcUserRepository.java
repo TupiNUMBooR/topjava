@@ -16,11 +16,10 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional(readOnly = true)
@@ -93,21 +92,22 @@ public class JdbcUserRepository extends JdbcRepository implements UserRepository
                 .addValue("user_id", user.getId())
                 .addValue("role", role.toString());
 
-        var currentRoles = new HashSet<>(jdbcTemplate.query("SELECT * FROM user_role WHERE user_id=?",
-                ROLE_ROW_MAPPER, user.getId()));
+        var currentRoles = jdbcTemplate
+                .queryForStream("SELECT * FROM user_role WHERE user_id=?", ROLE_ROW_MAPPER, user.getId())
+                .collect(Collectors.toSet());
 
-        var deleteParams = toSqlParams(user.getId(), currentRoles.stream().filter(r -> !user.getRoles().contains(r)));
-        namedParameterJdbcTemplate.batchUpdate("DELETE FROM user_role WHERE user_id=:user_id AND role=:role", deleteParams);
-
-        var addParams = toSqlParams(user.getId(), user.getRoles().stream().filter(r -> !currentRoles.contains(r)));
-        insertRole.executeBatch(addParams);
-    }
-
-    private MapSqlParameterSource[] toSqlParams(int userId, Stream<Role> roles) {
-        return roles.map(role -> new MapSqlParameterSource()
-                        .addValue("user_id", userId)
-                        .addValue("role", role.toString()))
+        var toDelete = currentRoles.stream()
+                .filter(r -> !user.getRoles().contains(r))
+                .map(mapper)
                 .toArray(MapSqlParameterSource[]::new);
+        namedParameterJdbcTemplate.batchUpdate("DELETE FROM user_role WHERE user_id=:user_id AND role=:role",
+                toDelete);
+
+        var toAdd = user.getRoles().stream()
+                .filter(r -> !currentRoles.contains(r))
+                .map(mapper)
+                .toArray(MapSqlParameterSource[]::new);
+        insertRole.executeBatch(toAdd);
     }
 
     @Override
