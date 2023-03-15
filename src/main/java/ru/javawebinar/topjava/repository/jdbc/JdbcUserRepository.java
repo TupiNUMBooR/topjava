@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Repository
 @Transactional(readOnly = true)
@@ -88,26 +89,25 @@ public class JdbcUserRepository extends JdbcRepository implements UserRepository
     }
 
     private void updateUserRoles(User user) {
-        Function<Role, MapSqlParameterSource> mapper = role ->
-                new MapSqlParameterSource()
-                        .addValue("user_id", user.getId())
-                        .addValue("role", role.toString());
+        Function<Role, MapSqlParameterSource> mapper = role -> new MapSqlParameterSource()
+                .addValue("user_id", user.getId())
+                .addValue("role", role.toString());
 
-        var currentRoles = new HashSet<>(jdbcTemplate.query(
-                "SELECT * FROM user_role WHERE user_id=?", ROLE_ROW_MAPPER, user.getId()));
+        var currentRoles = new HashSet<>(jdbcTemplate.query("SELECT * FROM user_role WHERE user_id=?",
+                ROLE_ROW_MAPPER, user.getId()));
 
-        var rolesToDelete = currentRoles.stream()
-                .filter(r -> !user.getRoles().contains(r))
-                .map(mapper)
+        var deleteParams = toSqlParams(user.getId(), currentRoles.stream().filter(r -> !user.getRoles().contains(r)));
+        namedParameterJdbcTemplate.batchUpdate("DELETE FROM user_role WHERE user_id=:user_id AND role=:role", deleteParams);
+
+        var addParams = toSqlParams(user.getId(), user.getRoles().stream().filter(r -> !currentRoles.contains(r)));
+        insertRole.executeBatch(addParams);
+    }
+
+    private MapSqlParameterSource[] toSqlParams(int userId, Stream<Role> roles) {
+        return roles.map(role -> new MapSqlParameterSource()
+                        .addValue("user_id", userId)
+                        .addValue("role", role.toString()))
                 .toArray(MapSqlParameterSource[]::new);
-        var res = namedParameterJdbcTemplate.batchUpdate(
-                "DELETE FROM user_role WHERE user_id=:user_id AND role=:role", rolesToDelete);
-
-        var rolesToAdd = user.getRoles().stream()
-                .filter(r -> !currentRoles.contains(r))
-                .map(mapper)
-                .toArray(MapSqlParameterSource[]::new);
-        var res2 = insertRole.executeBatch(rolesToAdd);
     }
 
     @Override
