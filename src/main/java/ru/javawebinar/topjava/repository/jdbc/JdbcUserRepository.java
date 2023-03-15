@@ -52,7 +52,6 @@ public class JdbcUserRepository extends JdbcRepository implements UserRepository
     };
 
 
-
     private final SimpleJdbcInsert insertUser;
 
     private final SimpleJdbcInsert insertRole;

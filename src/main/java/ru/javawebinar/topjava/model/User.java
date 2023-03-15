@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.model;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.util.CollectionUtils;
 
