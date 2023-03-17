@@ -16,10 +16,11 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.validate;
 
@@ -31,18 +32,15 @@ public class JdbcUserRepository implements UserRepository {
 
     private static final RowMapper<Role> ROLE_ROW_MAPPER = (rs, rowNum) -> {
         var role = rs.getString("role");
-        if (role != null) return Role.valueOf(role);
-        return null;
+        return role != null ? Role.valueOf(role) : null;
     };
 
     private static final ResultSetExtractor<List<User>> USER_EXTRACTOR = rs -> {
         var users = new LinkedHashMap<Integer, User>();
         while (rs.next()) {
             var id = rs.getInt("id");
-            User user;
-            if (users.containsKey(id)) {
-                user = users.get(id);
-            } else {
+            var user = users.get(id);
+            if (user == null) {
                 user = ROW_MAPPER.mapRow(rs, 0);
                 user.setRoles(List.of());
                 users.put(id, user);
@@ -50,7 +48,7 @@ public class JdbcUserRepository implements UserRepository {
             var role = ROLE_ROW_MAPPER.mapRow(rs, 0);
             if (role != null) user.getRoles().add(role);
         }
-        return users.values().stream().toList();
+        return new ArrayList<>(users.values());
     };
 
     private final JdbcTemplate jdbcTemplate;
@@ -82,38 +80,46 @@ public class JdbcUserRepository implements UserRepository {
         if (user.isNew()) {
             Number newKey = insertUser.executeAndReturnKey(parameterSource);
             user.setId(newKey.intValue());
-        } else if (namedParameterJdbcTemplate.update("""
-                   UPDATE users SET name=:name, email=:email, password=:password,
-                   registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
-                """, parameterSource) == 0) {
-            return null;
+            insertRoles(user);
+        } else {
+            var updated = namedParameterJdbcTemplate.update("""
+                       UPDATE users SET name=:name, email=:email, password=:password,
+                       registered=:registered, enabled=:enabled, calories_per_day=:caloriesPerDay WHERE id=:id
+                    """, parameterSource);
+            updateUserRoles(user);
+            if (updated == 0) {
+                return null;
+            }
         }
 
-        updateUserRoles(user);
         return user;
     }
 
     private void updateUserRoles(User user) {
-        Function<Role, MapSqlParameterSource> mapper = role -> new MapSqlParameterSource()
-                .addValue("user_id", user.getId())
-                .addValue("role", role.toString());
-
         var currentRoles = jdbcTemplate
                 .queryForStream("SELECT * FROM user_role WHERE user_id=?", ROLE_ROW_MAPPER, user.getId())
                 .collect(Collectors.toSet());
 
-        var toDelete = currentRoles.stream()
-                .filter(r -> !user.getRoles().contains(r))
-                .map(mapper)
-                .toArray(MapSqlParameterSource[]::new);
+        var toDelete = toSqlParams(user.getId(),
+                currentRoles.stream().filter(r -> !user.getRoles().contains(r)));
         namedParameterJdbcTemplate.batchUpdate("DELETE FROM user_role WHERE user_id=:user_id AND role=:role",
                 toDelete);
 
-        var toAdd = user.getRoles().stream()
-                .filter(r -> !currentRoles.contains(r))
-                .map(mapper)
-                .toArray(MapSqlParameterSource[]::new);
+        var toAdd = toSqlParams(user.getId(),
+                user.getRoles().stream().filter(r -> !currentRoles.contains(r)));
         insertRole.executeBatch(toAdd);
+    }
+
+    private void insertRoles(User user) {
+        var toAdd = toSqlParams(user.getId(), user.getRoles().stream());
+        insertRole.executeBatch(toAdd);
+    }
+
+    private MapSqlParameterSource[] toSqlParams(int userId, Stream<Role> roles) {
+        return roles.map(role -> new MapSqlParameterSource()
+                        .addValue("user_id", userId)
+                        .addValue("role", role.toString()))
+                .toArray(MapSqlParameterSource[]::new);
     }
 
     @Override
