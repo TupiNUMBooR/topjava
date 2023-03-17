@@ -1,12 +1,16 @@
 package ru.javawebinar.topjava.util;
 
-
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 public class ValidationUtil {
+    private static Validator validator;
 
     private ValidationUtil() {
     }
@@ -51,5 +55,19 @@ public class ValidationUtil {
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
+    }
+
+    private static Validator getValidator() {
+        if (validator == null) {
+            try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
+                validator = validatorFactory.getValidator();
+            }
+        }
+        return validator;
+    }
+
+    public static <T> void validate(T t) {
+        var violations = getValidator().validate(t);
+        if (!violations.isEmpty()) throw new ConstraintViolationException(violations);
     }
 }
