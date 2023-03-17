@@ -20,11 +20,7 @@
 
     <tx:annotation-driven/>
 
-    <!-- Choose profile from (hsqldb/ postgres) and (jdbc/ datajpa/ jpa), (test) is optional for tests -->
-
-    <beans profile="test">
-        <context:property-placeholder ignore-unresolvable="true" location="classpath:db/test.properties"/>
-    </beans>
+    <!-- Choose profile from (hsqldb/ postgres) and (jdbc/ datajpa/ jpa) -->
 
     <beans profile="hsqldb">
         <context:property-placeholder location="classpath:db/hsqldb.properties" system-properties-mode="OVERRIDE"/>
