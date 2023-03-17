@@ -18,29 +18,29 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 @Controller
-@RequestMapping(value = "/meals")
+@RequestMapping("meals")
 public class JspMealController extends MealController {
     public JspMealController(MealService service) {
         super(service);
     }
 
-    @GetMapping(params = "action=update")
+    @GetMapping("update")
     public String getUpdate(Model model, @RequestParam("id") int id) {
         int userId = SecurityUtil.authUserId();
         log.info("get update meal {} for user {}", id, userId);
         model.addAttribute(service.get(id, userId));
-        return "mealForm";
+        return "/mealForm";
     }
 
-    @GetMapping(params = "action=create")
+    @GetMapping("create")
     public String getCreate(Model model) {
         log.info("create meal for user {}", SecurityUtil.authUserId());
         model.addAttribute(new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000));
-        return "mealForm";
+        return "/mealForm";
     }
 
     // https://stackoverflow.com/questions/40274353/how-to-use-localdatetime-requestparam-in-spring-i-get-failed-to-convert-string
-    @GetMapping(params = "action=filter")
+    @GetMapping()
     public String filter(Model model,
                          @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                          @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -53,27 +53,18 @@ public class JspMealController extends MealController {
         var mealsDateFiltered = service.getBetweenInclusive(startDate, endDate, userId);
         var mealsTo = MealsUtil.getFilteredTos(mealsDateFiltered, SecurityUtil.authUserCaloriesPerDay(), startTime, endTime);
         model.addAttribute("meals", mealsTo);
-        return "meals";
+        return "/meals";
     }
 
-    @GetMapping()
-    public String getAll(Model model) {
-        int userId = SecurityUtil.authUserId();
-        log.info("getAll for user {}", userId);
-        var tos = MealsUtil.getTos(service.getAll(userId), SecurityUtil.authUserCaloriesPerDay());
-        model.addAttribute("meals", tos);
-        return "meals";
-    }
-
-    @GetMapping(params = "action=delete")
+    @GetMapping("delete")
     public String delete(@RequestParam("id") int id) {
         int userId = SecurityUtil.authUserId();
         log.info("delete meal {} for user {}", id, userId);
         service.delete(id, userId);
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
-    @PostMapping()
+    @PostMapping
     public String postUpdate(@RequestParam(value = "id", required = false) Integer id,
                              @RequestParam("dateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
                              @RequestParam("description") String description,
@@ -87,6 +78,6 @@ public class JspMealController extends MealController {
             log.info("create {} for user {}", meal, userId);
             service.create(meal, userId);
         }
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 }
