@@ -18,8 +18,6 @@ public interface CrudUserRepository extends JpaRepository<User, Integer> {
     User getByEmail(String email);
 
     @EntityGraph(attributePaths = {"meals"}, type = EntityGraph.EntityGraphType.LOAD)
-    // Либо делать JOIN FETCH u.meals без EntityGraph
-    // Но я так и не понял почему при {"meals", "roles"} без JOIN FETCH даже при roles LAZY дублируется meals. Может баг?
     @Query("SELECT u FROM User u WHERE u.id=?1")
     User getWithMeals(int id);
 }

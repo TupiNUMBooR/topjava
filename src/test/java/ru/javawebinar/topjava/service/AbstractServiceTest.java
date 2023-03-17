@@ -13,10 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.ActiveDbProfileResolver;
-import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.TimingRules;
-
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
@@ -27,7 +24,7 @@ import static ru.javawebinar.topjava.util.ValidationUtil.getRootCause;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class, value = "test")
+@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
 public abstract class AbstractServiceTest {
 
     @ClassRule
@@ -48,9 +45,5 @@ public abstract class AbstractServiceTest {
                 throw getRootCause(e);
             }
         });
-    }
-
-    protected boolean isJdbc() {
-        return Stream.of(env.getActiveProfiles()).anyMatch(Profiles.JDBC::equals);
     }
 }
