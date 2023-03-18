@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit;
 
 @Controller
 @RequestMapping("meals")
-public class JspMealController extends MealRestController {
+public class JspMealController extends MealController {
     public JspMealController(MealService service) {
         super(service);
     }
