@@ -1,3 +1,7 @@
+# REST docs
+
+## meals
+
 `curl -i "http://localhost:8080/topjava/rest/meals"`  
 `curl -i "http://localhost:8080/topjava/rest/meals/100003"`  
 `curl -i "http://localhost:8080/topjava/rest/meals/filter?startDate=2020-01-30&endDate=2020-01-30&startTime=10:00&endTime=13:01"`  
