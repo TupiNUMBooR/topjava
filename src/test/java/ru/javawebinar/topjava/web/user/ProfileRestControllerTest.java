@@ -36,8 +36,11 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(USER_MATCHER.contentJson(user))
-                .andExpect(result -> MEAL_MATCHER.assertMatch(readJson(result, User.class).getMeals(), meals));
+                .andExpect(result -> {
+                    var actual = USER_MATCHER.readFromJson(result);
+                    USER_MATCHER.assertMatch(actual, user);
+                    MEAL_MATCHER.assertMatch(actual.getMeals(), meals);
+                });
     }
 
     @Test
