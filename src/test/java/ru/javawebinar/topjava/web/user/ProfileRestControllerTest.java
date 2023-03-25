@@ -3,7 +3,9 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
@@ -31,6 +33,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @EnabledIf(expression = "#{environment.acceptsProfiles('" + Profiles.DATAJPA + "')}", loadContext = true)
     void getWithMeals() throws Exception {
         perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals"))
                 .andExpect(status().isOk())
