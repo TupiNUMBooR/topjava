@@ -16,8 +16,6 @@
         </property>
     </bean>
 
-    <mvc:annotation-driven conversion-service="conversionService"/>
-
     <bean class="ru.javawebinar.topjava.web.json.JacksonObjectMapper" id="objectMapper" factory-method="getMapper"/>
 
     <mvc:annotation-driven conversion-service="conversionService">
