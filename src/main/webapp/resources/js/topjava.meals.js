@@ -40,9 +40,28 @@ $(function () {
     );
 });
 
-filterForm = $('#filter');
+var filterForm = $('#filter');
+var filtered = false;
+
+function updateTable() { // своеобразный override
+    if (filtered) {
+        $.ajax({
+            url: ctx.ajaxUrl + "filter",
+            type: "get",
+            data: filterForm.serialize()
+        }).done(data => {
+            fillTable(data);
+        });
+    } else {
+        filterForm.find(":input").val("");
+        $.get(ctx.ajaxUrl, data => {
+            fillTable(data);
+        });
+    }
+}
 
 function filterTable() {
+    filtered = true;
     $.ajax({
         url: ctx.ajaxUrl + "filter",
         type: "get",
@@ -54,6 +73,7 @@ function filterTable() {
 }
 
 function unfilterTable() {
+    filtered = false;
     filterForm.find(":input").val("");
     $.get(ctx.ajaxUrl, data => {
         fillTable(data);
