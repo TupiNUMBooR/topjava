@@ -45,19 +45,31 @@ $(function () {
         })
     );
 
-    $(".user-enabler").click(data => {
-        var tr = $(data.target).closest('tr');
-        var id = tr.attr("id");
-        var enabled = $(data.target).is(":checked");
+    $(".user-enabler").click(function (e) {
+        var tr = $(this).closest('tr');
+        var checkbox = this;
+        var enabled = checkbox.checked;
+        checkbox.disabled = true;
+        $("body").css("cursor", "progress");
+
         $.ajax({
-            url: ctx.ajaxUrl + id + "/enable",
-            type: "POST",
-            data: {
-                "enabled": enabled
-            }
-        }).done(function () {
+            url: ctx.ajaxUrl + tr.attr("id") + "?enabled=" + enabled,
+            type: "PATCH",
+            // data: {"enabled": enabled} // так и не понял почему не работает
+        }).done(e => {
             successNoty(enabled ? "Enabled" : "Disabled");
             tr.toggleClass("text-warning", !enabled)
+        }).fail(e => {
+            checkbox.checked = !enabled
+        }).always(e => {
+            checkbox.disabled = false;
+            $("body").css("cursor", "default");
         });
     });
 });
+
+function updateTable() {
+    $.get(ctx.ajaxUrl, function (data) {
+        fillTable(data);
+    });
+}

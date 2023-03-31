@@ -13,7 +13,7 @@
     <div class="container">
         <h3 class="text-center"><spring:message code="meal.title"/></h3>
         <div class="card border-dark p-3">
-            <form id="filter" action="meals/filter">
+            <form id="filter">
                 <div class="d-flex justify-content-between">
                     <div>
                         <label><spring:message code="meal.startDate"/>

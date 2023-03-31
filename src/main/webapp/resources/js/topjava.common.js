@@ -32,12 +32,6 @@ function deleteRow(id) {
     });
 }
 
-function updateTable() {
-    $.get(ctx.ajaxUrl, function (data) {
-        fillTable(data);
-    });
-}
-
 function fillTable(data) {
     ctx.datatableApi.clear().rows.add(data).draw();
 }

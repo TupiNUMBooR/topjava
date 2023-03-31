@@ -43,8 +43,8 @@ public class DateTimeFormatters {
         }
 
         @Override
-        public String print(LocalDateTime lt, Locale locale) {
-            return lt.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        public String print(LocalDateTime ldt, Locale locale) {
+            return ldt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         }
     }
 }
