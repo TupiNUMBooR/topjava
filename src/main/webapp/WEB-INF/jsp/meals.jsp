@@ -40,10 +40,10 @@
                 </div>
             </form>
             <div>
-                <button class="btn btn-outline-primary" type="submit" form="filter">
-                    <span class="fa fa-filter"></span> <spring:message code="meal.filter"/>
-                </button>
-                <a class="btn btn-outline-danger" href="meals"><spring:message code="common.cancel"/></a>
+                <button class="btn btn-outline-primary" onclick="filterTable()">
+                    <span class="fa fa-filter"></span> <spring:message code="meal.filter"/></button>
+                <button class="btn btn-outline-danger" onclick="unfilterTable()">
+                    <spring:message code="common.cancel"/></button>
             </div>
         </div>
 

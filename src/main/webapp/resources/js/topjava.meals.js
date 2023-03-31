@@ -39,3 +39,24 @@ $(function () {
         })
     );
 });
+
+filterForm = $('#filter');
+
+function filterTable() {
+    $.ajax({
+        url: ctx.ajaxUrl + "filter",
+        type: "get",
+        data: filterForm.serialize()
+    }).done(data => {
+        fillTable(data);
+        successNoty("Filtered");
+    });
+}
+
+function unfilterTable() {
+    filterForm.find(":input").val("");
+    $.get(ctx.ajaxUrl, data => {
+        fillTable(data);
+        successNoty("Filter cleared");
+    });
+}
