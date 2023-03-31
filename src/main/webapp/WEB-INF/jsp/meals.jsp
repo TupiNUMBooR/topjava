@@ -4,61 +4,79 @@
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
+<script src="resources/js/topjava.common.js" defer></script>
+<script src="resources/js/topjava.meals.js" defer></script>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 
-<section>
-    <h3><spring:message code="meal.title"/></h3>
+<div class="jumbotron pt-4">
+    <div class="container">
+        <h3 class="text-center"><spring:message code="meal.title"/></h3>
+        <div class="card border-dark p-3">
+            <form id="filter" action="meals/filter">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <label><spring:message code="meal.startDate"/>
+                            <input type="date" name="startDate" autocomplete="off">
+                        </label>
+                    </div>
+                    <div>
+                        <label><spring:message code="meal.endDate"/>
+                            <input type="date" name="endDate" autocomplete="off">
+                        </label>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <label><spring:message code="meal.startTime"/>
+                            <input type="time" name="startTime" autocomplete="off">
+                        </label>
+                    </div>
+                    <div>
+                        <label><spring:message code="meal.endTime"/>
+                            <input type="time" name="endTime" autocomplete="off">
+                        </label>
+                    </div>
+                </div>
+            </form>
+            <div>
+                <button class="btn btn-outline-primary" type="submit" form="filter">
+                    <span class="fa fa-filter"></span> <spring:message code="meal.filter"/>
+                </button>
+                <a class="btn btn-outline-danger" href="meals"><spring:message code="common.cancel"/></a>
+            </div>
+        </div>
 
-    <form method="get" action="meals/filter">
-        <dl>
-            <dt><spring:message code="meal.startDate"/>:</dt>
-            <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.endDate"/>:</dt>
-            <dd><input type="date" name="endDate" value="${param.endDate}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.startTime"/>:</dt>
-            <dd><input type="time" name="startTime" value="${param.startTime}"></dd>
-        </dl>
-        <dl>
-            <dt><spring:message code="meal.endTime"/>:</dt>
-            <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
-        </dl>
-        <button type="submit"><spring:message code="meal.filter"/></button>
-    </form>
-    <hr>
-    <a href="meals/create"><spring:message code="meal.add"/></a>
-    <hr>
-    <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-        <tr>
-            <th><spring:message code="meal.dateTime"/></th>
-            <th><spring:message code="meal.description"/></th>
-            <th><spring:message code="meal.calories"/></th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <c:forEach items="${requestScope.meals}" var="meal">
-            <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
-            <tr data-meal-excess="${meal.excess}">
-                <td>
-                        <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
-                        <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                        <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
-                        ${fn:formatDateTime(meal.dateTime)}
-                </td>
-                <td>${meal.description}</td>
-                <td>${meal.calories}</td>
-                <td><a href="meals/update?id=${meal.id}"><spring:message code="common.update"/></a></td>
-                <td><a href="meals/delete?id=${meal.id}"><spring:message code="common.delete"/></a></td>
+        <table class="table table-striped" id="datatable">
+            <thead>
+            <tr>
+                <th><spring:message code="meal.dateTime"/></th>
+                <th><spring:message code="meal.description"/></th>
+                <th><spring:message code="meal.calories"/></th>
+                <th>
+                    <button class="btn btn-outline-success add"><span class="fa fa-plus"></span></button>
+                </th>
+                <th></th>
             </tr>
-        </c:forEach>
-    </table>
-</section>
+            </thead>
+            <c:forEach items="${requestScope.meals}" var="meal">
+                <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
+                <tr id="${meal.id}" data-meal-excess="${meal.excess}">
+                    <td>${fn:formatDateTime(meal.dateTime)}</td>
+                    <td>${meal.description}</td>
+                    <td>${meal.calories}</td>
+                    <td>
+                        <button class="btn btn-outline-info edit"><span class="fa fa-pencil"></span></button>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-danger delete"><span class="fa fa-remove"></span></button>
+                    </td>
+                </tr>
+            </c:forEach>
+        </table>
+    </div>
+</div>
+
 <jsp:include page="fragments/footer.jsp"/>
 </body>
 </html>
