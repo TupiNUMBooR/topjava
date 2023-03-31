@@ -44,4 +44,20 @@ $(function () {
             ]
         })
     );
+
+    $(".user-enabler").click(data => {
+        var tr = $(data.target).closest('tr');
+        var id = tr.attr("id");
+        var enabled = $(data.target).is(":checked");
+        $.ajax({
+            url: ctx.ajaxUrl + id + "/enable",
+            type: "POST",
+            data: {
+                "enabled": enabled
+            }
+        }).done(function () {
+            successNoty(enabled ? "Enabled" : "Disabled");
+            tr.toggleClass("text-warning", !enabled)
+        });
+    });
 });
