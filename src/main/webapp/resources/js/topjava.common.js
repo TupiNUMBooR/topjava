@@ -10,6 +10,14 @@ function makeEditable(datatableApi) {
 
     // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
     $.ajaxSetup({cache: false});
+
+    $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+        if (options.data != null) {
+            var s = decodeURIComponent(options.data);
+            s = s.replace(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})/, "$1T$2");
+            options.data = s;
+        }
+    })
 }
 
 function add() {
@@ -23,6 +31,9 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
+            if (typeof value == 'string') {
+                value = value.replace(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/, "$1 $2");
+            }
             form.find("input[name='" + key + "']").val(value);
         });
         $('#editRow').modal();
