@@ -28,7 +28,13 @@ $(function () {
             "info": true,
             "columns": [
                 {
-                    "data": "dateTime"
+                    "data": "dateTime",
+                    "render": function (data, type, row) {
+                        if (type === "display") {
+                            return data.replace("T", " ");
+                        }
+                        return data;
+                    }
                 },
                 {
                     "data": "description"
