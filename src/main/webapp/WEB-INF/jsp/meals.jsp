@@ -62,21 +62,21 @@
                 <th></th>
             </tr>
             </thead>
-            <c:forEach items="${requestScope.meals}" var="meal">
-                <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
-                <tr data-meal-excess="${meal.excess}">
-                    <td>
-                            <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
-                            <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                            <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
-                            ${fn:formatDateTime(meal.dateTime)}
-                    </td>
-                    <td>${meal.description}</td>
-                    <td>${meal.calories}</td>
-                    <td><a><span class="fa fa-pencil"></span></a></td>
-                    <td><a onclick="deleteRow(${meal.id})"><span class="fa fa-remove"></span></a></td>
-                </tr>
-            </c:forEach>
+<%--            <c:forEach items="${requestScope.meals}" var="meal">--%>
+<%--                <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>--%>
+<%--                <tr data-meal-excess="${meal.excess}">--%>
+<%--                    <td>--%>
+<%--                            &lt;%&ndash;${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}&ndash;%&gt;--%>
+<%--                            &lt;%&ndash;<%=TimeUtil.toString(meal.getDateTime())%>&ndash;%&gt;--%>
+<%--                            &lt;%&ndash;${fn:replace(meal.dateTime, 'T', ' ')}&ndash;%&gt;--%>
+<%--                            ${fn:formatDateTime(meal.dateTime)}--%>
+<%--                    </td>--%>
+<%--                    <td>${meal.description}</td>--%>
+<%--                    <td>${meal.calories}</td>--%>
+<%--                    <td><a><span class="fa fa-pencil"></span></a></td>--%>
+<%--                    <td><a onclick="deleteRow(${meal.id})"><span class="fa fa-remove"></span></a></td>--%>
+<%--                </tr>--%>
+<%--            </c:forEach>--%>
         </table>
     </div>
 </div>
@@ -110,6 +110,7 @@
                         <input type="number" class="form-control" id="calories" name="calories" placeholder="1000">
                     </div>
                 </form>
+                <input type="hidden" id="excess" name="excess" value="false" form="detailsForm"> <%--пока не придумал способа лучше--%>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeNoty()">
@@ -126,4 +127,13 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 </body>
+<script type="text/javascript">
+    const i18n = [];
+    i18n["addTitle"] = '<spring:message code="user.add"/>';
+    i18n["editTitle"] = '<spring:message code="user.edit"/>';
+
+    <c:forEach var="key" items='<%=new String[]{"common.deleted","common.saved","common.enabled","common.disabled","common.errorStatus","common.confirm"}%>'>
+    i18n["${key}"] = "<spring:message code="${key}"/>";
+    </c:forEach>
+</script>
 </html>
