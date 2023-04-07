@@ -31,8 +31,8 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(ctx.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
-            if (typeof value == 'string') {
-                value = value.replace(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/, "$1 $2");
+            if (key === "dateTime") {
+                value = value.replace(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}):\d{2}/, "$1 $2");
             }
             form.find("input[name='" + key + "']").val(value);
         });

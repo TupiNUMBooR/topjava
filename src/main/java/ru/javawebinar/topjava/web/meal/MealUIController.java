@@ -41,14 +41,14 @@ public class MealUIController extends AbstractMealController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> createOrUpdate(@Valid MealTo mealTo, BindingResult result) {
+    public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
         var error = ValidationUtil.getErrorResponseEntity(result);
-        if (error != null) return error;
+        if (error != null) return error; // стоит ли теперь здесь валидировать, если все равно будет валидация в repo?
 
-        if (mealTo.isNew()) {
-            super.create(mealTo);
+        if (meal.isNew()) {
+            super.create(meal);
         } else {
-            super.update(mealTo, mealTo.id());
+            super.update(meal, meal.id());
         }
 
         return ResponseEntity.ok().build();

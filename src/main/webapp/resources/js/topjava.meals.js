@@ -18,17 +18,36 @@ function clearFilter() {
 }
 
 $(function () {
-    $(".datetimepicker").datetimepicker({
+    $("#dateTime").datetimepicker({
         format: 'Y-m-d H:i'
     });
-    $('.datetimepicker-time').datetimepicker({
-        format: 'H:i',
-        datepicker: false
-    });
-    $('.datetimepicker-date').datetimepicker({
+
+    var startDate = $("#startDate");
+    var endDate = $("#endDate");
+    startDate.datetimepicker({
         format: 'Y-m-d',
-        timepicker: false
+        timepicker: false,
+        onShow: d => startDate.datetimepicker({maxDate: dtConstraint(endDate)})
     });
+    endDate.datetimepicker({
+        format: 'Y-m-d',
+        timepicker: false,
+        onShow: d => endDate.datetimepicker({minDate: dtConstraint(startDate)})
+    });
+
+    var startTime = $("#startTime");
+    var endTime = $("#endTime");
+    startTime.datetimepicker({
+        format: 'H:i',
+        datepicker: false,
+        onShow: d => startTime.datetimepicker({maxTime: dtConstraint(endTime)})
+    });
+    endTime.datetimepicker({
+        format: 'H:i',
+        datepicker: false,
+        onShow: d => endTime.datetimepicker({minTime: dtConstraint(startTime)})
+    });
+
     makeEditable(
         $("#datatable").DataTable({
             "ajax": {
@@ -42,7 +61,7 @@ $(function () {
                     "data": "dateTime",
                     "render": function (data, type, row) {
                         if (type === "display") {
-                            return data.replace("T", " ");
+                            return data.replace(/(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}):\d{2}/, "$1 $2");
                         }
                         return data;
                     }
@@ -76,3 +95,7 @@ $(function () {
         })
     );
 });
+
+function dtConstraint(input) {
+    return input.val() ? input.val() : false;
+}
