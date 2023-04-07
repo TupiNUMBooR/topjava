@@ -41,6 +41,12 @@ public abstract class AbstractMealController {
         return MealsUtil.getTos(service.getAll(userId), SecurityUtil.authUserCaloriesPerDay());
     }
 
+    public void create(MealTo mealTo) {
+        log.info("create {}", mealTo);
+        checkNew(mealTo);
+        service.create(MealsUtil.createNewFromTo(mealTo), SecurityUtil.authUserId());
+    }
+
     public Meal create(Meal meal) {
         int userId = SecurityUtil.authUserId();
         log.info("create {} for user {}", meal, userId);
