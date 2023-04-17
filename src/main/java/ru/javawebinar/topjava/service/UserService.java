@@ -15,6 +15,7 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UsersUtil;
+import ru.javawebinar.topjava.util.exception.DuplicateEmailException;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class UserService implements UserDetailsService {
     @CacheEvict(value = "users", allEntries = true)
     public User create(User user) {
         Assert.notNull(user, "user must not be null");
+        checkEmail(user.getId(), user.getEmail());
         return prepareAndSave(user);
     }
 
@@ -63,6 +65,7 @@ public class UserService implements UserDetailsService {
     public void update(User user) {
         Assert.notNull(user, "user must not be null");
 //      checkNotFoundWithId : check works only for JDBC, disabled
+        checkEmail(user.getId(), user.getEmail());
         prepareAndSave(user);
     }
 
@@ -70,6 +73,12 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void update(UserTo userTo) {
         User user = get(userTo.id());
+        if (!userTo.getEmail().equalsIgnoreCase(user.getEmail())) {
+            // не понял почему, но если вызвать checkEmail в prepareAndSave,
+            // то он может выдать ошибку PSQL:
+            // duplicate key value violates unique constraint "users_unique_email_idx"
+            checkEmail(userTo.getId(), userTo.getEmail());
+        }
         prepareAndSave(UsersUtil.updateFromTo(user, userTo));
     }
 
@@ -96,5 +105,13 @@ public class UserService implements UserDetailsService {
 
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
+    }
+
+    private void checkEmail(Integer id, String newEmail) {
+        newEmail = newEmail.toLowerCase();
+        var found = repository.getByEmail(newEmail);
+        if (found != null && !found.getId().equals(id)) {
+            throw new DuplicateEmailException("User " + newEmail + " already exists!");
+        }
     }
 }
