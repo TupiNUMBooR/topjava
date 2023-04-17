@@ -72,7 +72,7 @@ public class ExceptionInfoHandler {
 
     private static void logException(HttpServletRequest req, boolean logException, ErrorType errorType, String detail) {
         if (logException) {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), detail);
+            log.error("{} at request  {}: {}", errorType, req.getRequestURL(), detail);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), detail);
         }

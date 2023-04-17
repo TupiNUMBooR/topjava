@@ -2,8 +2,10 @@ package ru.javawebinar.topjava.service;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,7 @@ import ru.javawebinar.topjava.util.UsersUtil;
 import ru.javawebinar.topjava.util.exception.DuplicateEmailException;
 
 import java.util.List;
+import java.util.Locale;
 
 import static ru.javawebinar.topjava.util.UsersUtil.prepareToSave;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
@@ -29,10 +32,12 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.messageSource = messageSource;
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -111,7 +116,8 @@ public class UserService implements UserDetailsService {
         newEmail = newEmail.toLowerCase();
         var found = repository.getByEmail(newEmail);
         if (found != null && !found.getId().equals(id)) {
-            throw new DuplicateEmailException("User " + newEmail + " already exists!");
+            throw new DuplicateEmailException(messageSource.getMessage(
+                    "user.emailExists", new Object[]{newEmail}, LocaleContextHolder.getLocale()));
         }
     }
 }
