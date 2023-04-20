@@ -114,7 +114,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void createWithDuplicateEmail() throws Exception {
         User newUser = getNew();
-        newUser.setEmail(user.getEmail());
+        newUser.setEmail(admin.getEmail());
 
         var action = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)

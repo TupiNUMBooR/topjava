@@ -1,7 +1,7 @@
 package ru.javawebinar.topjava.model;
 
-public interface HasIdAndEmail {
-    Integer getId();
+import ru.javawebinar.topjava.HasId;
 
+public interface HasIdAndEmail extends HasId {
     String getEmail();
 }

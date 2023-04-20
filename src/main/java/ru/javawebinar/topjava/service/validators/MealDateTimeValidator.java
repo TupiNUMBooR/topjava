@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.web.validators;
+package ru.javawebinar.topjava.service.validators;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

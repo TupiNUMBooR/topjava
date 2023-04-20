@@ -22,6 +22,7 @@ import ru.javawebinar.topjava.util.exception.ErrorInfo;
 import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.service.validators.DuplicateEmailException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
@@ -59,6 +60,14 @@ public class ExceptionInfoHandler {
     @ExceptionHandler({BindException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindingResult result) {
         var detail = getErrorText(result);
+        logException(req, false, VALIDATION_ERROR, detail);
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler({DuplicateEmailException.class})
+    public ErrorInfo duplicateEmailError(HttpServletRequest req, DuplicateEmailException e) {
+        var detail = getErrorText(e.bindingResult);
         logException(req, false, VALIDATION_ERROR, detail);
         return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
     }

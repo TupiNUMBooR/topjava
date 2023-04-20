@@ -91,6 +91,31 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateWithDuplicateEmail() throws Exception {
+        var updatedTo = new UserTo(null, "newName", guest.getEmail(), "newPassword", 1500);
+        var action = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
+    void updateWithOwnEmail() throws Exception {
+        var updatedTo = new UserTo(null, "newName", user.getEmail(), "newPassword", 1500);
+        var action = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        USER_MATCHER.assertMatch(userService.get(USER_ID), UsersUtil.updateFromTo(new User(user), updatedTo));
+    }
+
+    @Test
     void getWithMeals() throws Exception {
         assumeDataJpa();
         perform(MockMvcRequestBuilders.get(REST_URL + "/with-meals")
