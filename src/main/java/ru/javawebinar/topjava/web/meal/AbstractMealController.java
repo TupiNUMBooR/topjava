@@ -11,7 +11,7 @@ import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
-import ru.javawebinar.topjava.service.validators.MealDateTimeValidator;
+import ru.javawebinar.topjava.web.validators.MealDateTimeValidator;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

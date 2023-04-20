@@ -80,7 +80,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void update() throws Exception {
-        UserTo updatedTo = new UserTo(null, "newName", "user@yandex.ru", "newPassword", 1500);
+        UserTo updatedTo = new UserTo(user.getId(), "newName", "user@yandex.ru", "newPassword", 1500);
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updatedTo)))
@@ -92,7 +92,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void updateWithDuplicateEmail() throws Exception {
-        var updatedTo = new UserTo(null, "newName", guest.getEmail(), "newPassword", 1500);
+        var updatedTo = new UserTo(user.getId(), "newName", guest.getEmail(), "newPassword", 1500);
         var action = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updatedTo)))
@@ -105,7 +105,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void updateWithOwnEmail() throws Exception {
-        var updatedTo = new UserTo(null, "newName", user.getEmail(), "newPassword", 1500);
+        var updatedTo = new UserTo(user.getId(), "newName", user.getEmail(), "newPassword", 1500);
         var action = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updatedTo)))

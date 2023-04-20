@@ -10,15 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.validation.DataBinder;
 import ru.javawebinar.topjava.AuthorizedUser;
-import ru.javawebinar.topjava.model.HasIdAndEmail;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UsersUtil;
-import ru.javawebinar.topjava.service.validators.DuplicateEmailException;
-import ru.javawebinar.topjava.service.validators.EmailValidator;
 
 import java.util.List;
 
@@ -32,18 +28,14 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailValidator emailValidator;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, EmailValidator emailValidator) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        this.emailValidator = emailValidator;
     }
 
     @CacheEvict(value = "users", allEntries = true)
-    @Transactional
     public User create(User user) {
-        validateEmail(user);
         Assert.notNull(user, "user must not be null");
         return prepareAndSave(user);
     }
@@ -68,9 +60,7 @@ public class UserService implements UserDetailsService {
     }
 
     @CacheEvict(value = "users", allEntries = true)
-    @Transactional
     public void update(User user) {
-        validateEmail(user);
         Assert.notNull(user, "user must not be null");
 //      checkNotFoundWithId : check works only for JDBC, disabled
         prepareAndSave(user);
@@ -79,7 +69,6 @@ public class UserService implements UserDetailsService {
     @CacheEvict(value = "users", allEntries = true)
     @Transactional
     public void update(UserTo userTo) {
-        validateEmail(userTo);
         User user = get(userTo.id());
         prepareAndSave(UsersUtil.updateFromTo(user, userTo));
     }
@@ -107,14 +96,5 @@ public class UserService implements UserDetailsService {
 
     public User getWithMeals(int id) {
         return checkNotFoundWithId(repository.getWithMeals(id), id);
-    }
-
-    private void validateEmail(HasIdAndEmail idAndEmail) {
-        DataBinder binder = new DataBinder(idAndEmail);
-        binder.addValidators(emailValidator);
-        binder.validate();
-        if (binder.getBindingResult().hasErrors()) {
-            throw new DuplicateEmailException(binder.getBindingResult());
-        }
     }
 }

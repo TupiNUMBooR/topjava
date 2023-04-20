@@ -10,19 +10,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.ErrorInfo;
 import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-import ru.javawebinar.topjava.service.validators.DuplicateEmailException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
+@ControllerAdvice(annotations = Controller.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
@@ -60,14 +58,6 @@ public class ExceptionInfoHandler {
     @ExceptionHandler({BindException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindingResult result) {
         var detail = getErrorText(result);
-        logException(req, false, VALIDATION_ERROR, detail);
-        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
-    }
-
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({DuplicateEmailException.class})
-    public ErrorInfo duplicateEmailError(HttpServletRequest req, DuplicateEmailException e) {
-        var detail = getErrorText(e.bindingResult);
         logException(req, false, VALIDATION_ERROR, detail);
         return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
     }

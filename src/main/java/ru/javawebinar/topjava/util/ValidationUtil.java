@@ -60,10 +60,9 @@ public class ValidationUtil {
 
     public static void assureIdConsistent(HasId bean, int id) {
 //      conservative when you reply, but accept liberally (http://stackoverflow.com/a/32728226/548473)
-        if (bean.isNew()) {
-            bean.setId(id);
-        } else if (bean.id() != id) {
-            throw new IllegalRequestDataException(bean + " must be with id=" + id);
+//      ed. перестаем так делать из за валидаторов емейла
+        if (bean.isNew() || bean.id() != id) {
+            throw new IllegalRequestDataException(bean + " must be with id=" + id + ", but has id=" + bean.getId());
         }
     }
 

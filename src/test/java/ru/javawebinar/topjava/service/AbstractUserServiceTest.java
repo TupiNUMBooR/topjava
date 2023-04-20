@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.service.validators.DuplicateEmailException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
@@ -33,7 +32,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     void duplicateMailCreate() {
-        assertThrows(DuplicateEmailException.class, () ->
+        assertThrows(DataAccessException.class, () ->
                 service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", 2000, Role.USER)));
     }
 

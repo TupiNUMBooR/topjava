@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.service.validators;
+package ru.javawebinar.topjava.web.validators;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,8 +20,6 @@ public class EmailValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        // @idAndEmail обязан содержать id для корректной проверки на сохранение без изменения своего емейла
-        // Тоесть проверку можно делать только после assureIdConsistent, поэтому я делаю ее в сервисах
         var idAndEmail = (HasIdAndEmail) target;
         var email = idAndEmail.getEmail().toLowerCase();
         var foundByEmail = repository.getByEmail(email);
@@ -31,7 +29,6 @@ public class EmailValidator implements Validator {
         }
 
         if (!idAndEmail.isNew() && foundByEmail.getId().equals(idAndEmail.getId())) {
-            // если email того же пользователя, которого изменяем
             return;
         }
 
