@@ -37,7 +37,7 @@ public class ExceptionInfoHandler {
     MessageSource messageSource;
 
     //  http://stackoverflow.com/a/22358422/548473
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY) // 422
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundError(HttpServletRequest req, NotFoundException e) {
         return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND);
@@ -73,7 +73,7 @@ public class ExceptionInfoHandler {
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         logException(req, logException, errorType, rootCause.toString());
-        return new ErrorInfo(req.getRequestURL(), errorType, List.of(rootCause.toString()));
+        return new ErrorInfo(req.getRequestURL(), errorType, logException ? List.of(rootCause.toString()) : List.of());
     }
 
     private static void logException(HttpServletRequest req, boolean logException, ErrorType errorType, String detail) {

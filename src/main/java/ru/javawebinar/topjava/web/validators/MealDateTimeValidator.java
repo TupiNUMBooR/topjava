@@ -22,6 +22,10 @@ public class MealDateTimeValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         var meal = (Meal) target;
+        if (meal.getDateTime() == null) {
+            return;
+        }
+
         var otherMeal = repository.getByDateTime(meal.getDateTime(), SecurityUtil.authUserId());
         if (otherMeal != null && !otherMeal.getId().equals(meal.getId())) {
             errors.rejectValue("dateTime", "meal.dateTimeExists",
