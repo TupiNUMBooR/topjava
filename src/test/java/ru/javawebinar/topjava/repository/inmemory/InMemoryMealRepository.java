@@ -77,4 +77,13 @@ public class InMemoryMealRepository implements MealRepository {
                         .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                         .toList();
     }
+
+    @Override
+    public Meal getByDateTime(LocalDateTime localDateTime, int userId) {
+        var meals = usersMealsMap.get(userId);
+        return meals == null ? null :
+                meals.getCollection().stream()
+                        .filter(m -> m.getDateTime().equals(localDateTime))
+                        .findAny().orElse(null);
+    }
 }

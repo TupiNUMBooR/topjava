@@ -73,7 +73,7 @@ public class ExceptionInfoHandler {
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         logException(req, logException, errorType, rootCause.toString());
-        return new ErrorInfo(req.getRequestURL(), errorType, logException ? List.of(rootCause.toString()) : List.of());
+        return new ErrorInfo(req.getRequestURL(), errorType, List.of(rootCause.getLocalizedMessage()));
     }
 
     private static void logException(HttpServletRequest req, boolean logException, ErrorType errorType, String detail) {
