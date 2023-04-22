@@ -21,17 +21,16 @@ public class EmailValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         var idAndEmail = (HasIdAndEmail) target;
+
+        if (idAndEmail.getEmail() == null) {
+            return;
+        }
+
         var email = idAndEmail.getEmail().toLowerCase();
         var foundByEmail = repository.getByEmail(email);
 
-        if (foundByEmail == null) {
-            return;
+        if (foundByEmail != null && !foundByEmail.getId().equals(idAndEmail.getId())) {
+            errors.rejectValue("email", "user.emailExists", new Object[]{email}, "");
         }
-
-        if (!idAndEmail.isNew() && foundByEmail.getId().equals(idAndEmail.getId())) {
-            return;
-        }
-
-        errors.rejectValue("email", "user.emailExists", new Object[]{email}, "");
     }
 }

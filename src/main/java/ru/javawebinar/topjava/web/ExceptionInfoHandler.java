@@ -10,10 +10,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.javawebinar.topjava.util.ValidationUtil;
 import ru.javawebinar.topjava.util.exception.ErrorInfo;
@@ -22,12 +24,11 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
 @RestControllerAdvice(annotations = RestController.class)
-@ControllerAdvice(annotations = Controller.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
@@ -57,9 +58,9 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class})
     public ErrorInfo bindingError(HttpServletRequest req, BindingResult result) {
-        var detail = getErrorText(result);
-        logException(req, false, VALIDATION_ERROR, detail);
-        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, detail);
+        var details = getErrorText(result);
+        logException(req, false, VALIDATION_ERROR, String.join("\n", details));
+        return new ErrorInfo(req.getRequestURL(), VALIDATION_ERROR, details);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -72,7 +73,7 @@ public class ExceptionInfoHandler {
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         logException(req, logException, errorType, rootCause.toString());
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.toString());
+        return new ErrorInfo(req.getRequestURL(), errorType, List.of(rootCause.toString()));
     }
 
     private static void logException(HttpServletRequest req, boolean logException, ErrorType errorType, String detail) {
@@ -83,11 +84,11 @@ public class ExceptionInfoHandler {
         }
     }
 
-    private String getErrorText(BindingResult result) {
+    private List<String> getErrorText(BindingResult result) {
         return result.getFieldErrors().stream()
                 .map(fe -> String.format("[%s] %s", fe.getField(),
                         messageSource.getMessage(fe.getCode(), fe.getArguments(), fe.getDefaultMessage(),
                                 LocaleContextHolder.getLocale())))
-                .collect(Collectors.joining("\n"));
+                .toList();
     }
 }

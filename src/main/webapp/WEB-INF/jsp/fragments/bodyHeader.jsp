@@ -30,8 +30,8 @@
             <a class="dropdown-toggle nav-link my-1 ml-2" data-toggle="dropdown">
                 <spring:message code="app.langShort"/></a>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="/topjava/login?lang=en">English</a>
-                <a class="dropdown-item" href="/topjava/login?lang=ru">Русский</a>
+                <a class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=en">English</a>
+                <a class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=ru">Русский</a>
             </div>
         </div>
     </div>
