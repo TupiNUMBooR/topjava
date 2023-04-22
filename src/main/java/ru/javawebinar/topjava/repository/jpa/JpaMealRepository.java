@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.repository.jpa;
 
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
@@ -58,5 +59,14 @@ public class JpaMealRepository implements MealRepository {
                 .setParameter("startDateTime", startDateTime)
                 .setParameter("endDateTime", endDateTime)
                 .getResultList();
+    }
+
+    @Override
+    public Meal getByDateTime(LocalDateTime localDateTime, int userId) {
+        var results = em.createNamedQuery(Meal.GET_BY_DATETIME, Meal.class)
+                .setParameter("userId", userId)
+                .setParameter("dateTime", localDateTime)
+                .getResultList();
+        return DataAccessUtils.singleResult(results);
     }
 }
