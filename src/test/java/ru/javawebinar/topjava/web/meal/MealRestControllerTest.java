@@ -83,6 +83,21 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateInvalid() throws Exception {
+        var meal = getNewInvalid();
+        meal.setId(meal.getId());
+
+        var action = perform(MockMvcRequestBuilders.put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(meal)))
+                .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
     void createWithLocation() throws Exception {
         Meal newMeal = getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
@@ -102,11 +117,27 @@ class MealRestControllerTest extends AbstractControllerTest {
     void createDuplicateDateTime() throws Exception {
         Meal newMeal = getNew();
         newMeal.setDateTime(meal1.getDateTime());
+
         var action = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(newMeal)))
                 .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
+    void createInvalid() throws Exception {
+        var newMeal = getNewInvalid();
+
+        var action = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(user))
+                .content(JsonUtil.writeValue(newMeal)))
+                .andExpect(status().isUnprocessableEntity());
+
         var resp = action.andReturn().getResponse().getContentAsString();
         assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
     }

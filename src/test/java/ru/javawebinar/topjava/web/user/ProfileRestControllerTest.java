@@ -79,6 +79,19 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void registerInvalid() throws Exception {
+        var testUser = getNewInvalidTo();
+
+        var action = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(testUser)))
+                .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
     void update() throws Exception {
         UserTo updatedTo = new UserTo(user.getId(), "newName", "user@yandex.ru", "newPassword", 1500);
         perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
@@ -96,6 +109,21 @@ class ProfileRestControllerTest extends AbstractControllerTest {
         var action = perform(MockMvcRequestBuilders.put(REST_URL).contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(user))
                 .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
+    void updateInvalid() throws Exception {
+        var testUser = getNewInvalidTo();
+
+        var action = perform(MockMvcRequestBuilders.put(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(JsonUtil.writeValue(testUser)))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
 

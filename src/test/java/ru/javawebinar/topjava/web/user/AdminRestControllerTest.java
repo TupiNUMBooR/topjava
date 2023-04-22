@@ -96,6 +96,21 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void updateInvalid() throws Exception {
+        var testUser = getNewInvalid();
+        testUser.setId(USER_ID);
+
+        var action = perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(jsonWithPassword(testUser, testUser.getPassword())))
+                .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
     void createWithLocation() throws Exception {
         User newUser = getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
@@ -121,6 +136,21 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(admin))
                 .content(jsonWithPassword(newUser, newUser.getPassword())))
                 .andExpect(status().isUnprocessableEntity());
+
+        var resp = action.andReturn().getResponse().getContentAsString();
+        assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
+    }
+
+    @Test
+    void createInvalid() throws Exception {
+        var testUser = getNewInvalid();
+
+        var action = perform(MockMvcRequestBuilders.post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(admin))
+                .content(jsonWithPassword(testUser, testUser.getPassword())))
+                .andExpect(status().isUnprocessableEntity());
+
         var resp = action.andReturn().getResponse().getContentAsString();
         assertTrue(resp.contains(ErrorType.VALIDATION_ERROR.name()));
     }
